@@ -6,7 +6,7 @@ tags:
   - Popover API
   - Floating UI
   - JavaScript
-date: 2024-10-02
+date: 2024-10-02T00:00:00.000Z
 ---
 Popover API є позитивною апішкою, проте робота з анкорінгом (привʼязкою поповера до кнопки-трігера) зроблена вкрай неінтуітивно і до того ж не працює в Firefox. Я подивився чим можно замінити роботу з анкорінгом, і знайшов [PopperJS](https://popper.js.org/docs/v2/) та більш новий [FloatingUI](https://floating-ui.com/).
 
@@ -17,7 +17,13 @@ Popover API є позитивною апішкою, проте робота з �
 Я зробив обгортку на AlpineJS для того щоб поповер міг себе правильно спозіціонувати відносно кнопки.
 
 ```js
-import { computePosition, autoUpdate } from "@floating-ui/dom";
+import {
+  computePosition,
+  autoUpdate,
+  offset,
+  flip,
+  shift,
+} from "@floating-ui/dom";
 
 export default () => {
   let removeAutoUpdate = () => {};
@@ -31,10 +37,16 @@ export default () => {
 
         removeAutoUpdate();
 
+        const placement =
+          this.$root.getAttribute("data-popover-placement") || "bottom-end";
+        const offsetValue =
+          parseInt(this.$root.getAttribute("data-popover-offset"), 10) || 4;
+
         removeAutoUpdate = autoUpdate(referenceEl, floatingEl, async () => {
           const { x, y } = await computePosition(referenceEl, floatingEl, {
             strategy: "fixed",
-            placement: "bottom-end",
+            placement,
+            middleware: [offset(offsetValue), flip(), shift()],
           });
 
           Object.assign(floatingEl.style, {

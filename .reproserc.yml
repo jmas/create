@@ -1,0 +1,50 @@
+fields:
+  - name: title
+    type: text
+  - name: description
+    type: multiline
+  - name: category
+    type: select
+  - name: tags
+    type: multiselect
+  - name: date
+    type: date
+    defaultValue: "%Y-%m-%d"
+values:
+  tags:
+    - Reprose
+    - Krokom.app
+    - UJournal
+    - Github
+    - Jekyll
+    - PHP
+    - Laravel
+    - JavaScript
+    - Ruby
+    - MySQL
+    - PostgreSQL
+    - Docker
+    - Supabase
+    - DigitalOcean
+    - Cloudflare
+    - Queuing
+    - Worflow Actions
+    - Reddit
+    - CRON
+    - Scheduling
+    - Tailwind
+    - Web-Push
+    - AlpineJS
+    - штучний інтелект
+    - програмування
+    - R2
+    - S3
+    - Medium
+    - Hotwire Turbo
+  category:
+    - Программування
+    - Проєкти
+    - Саморозвиток
+    - Психологія
+    - Думки
+    - Документалки

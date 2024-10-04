@@ -50,10 +50,10 @@ instance.interceptors.response.use(
   async (error) => {
 	  // Якщо статус каже про те що користувач не авторизований
     if (error.response.status === 401) {
-		  // Робимо запит на отримання нового токена, використовуя старий токен
+      // Робимо запит на отримання нового токена, використовуя старий токен
       const response = await instance.post("/auth");
 			
-			// Запомʼятовуємо новий токен в localStorage
+      // Запомʼятовуємо новий токен в localStorage
       if (response.status === 200) {
         auth.set(response.data);
 

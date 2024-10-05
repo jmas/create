@@ -20,7 +20,9 @@ order: 4
 повторення та перевірки, що дає можливість краще запомʼятати кроки або знайти загальне рішення,
 спробувати краще розібратися, та і взагалі, мати інструкцію на майбутнє.
 
-Сайт зроблено на [Jekyll](https://jekyllrb.com/) з використанням теми [chirpy](https://github.com/cotes2020/chirpy-starter).
+Сайт зроблено на [Jekyll](https://jekyllrb.com/) з використанням теми [Chirpy](https://github.com/cotes2020/chirpy-starter).
+
+Замітки пишуться у редакторі Markdown для Github [Reprose](https://reprose.pp.ua).
 
 Можно знайти мене в Twitter – [@maslakov](https://www.twitter.com/maslakov).
 

@@ -16,7 +16,7 @@ date: 2025-04-27
 
 Завантажити CiruitPython можно через [M5 Burner](https://docs.m5stack.com/en/download). В програмі треба зліва обрати потрібну плату – Cardputer і знайти Circuitpython. Далі потрібно підключити плату по USB, увімкнути та затиснути кнопку на боці корпусу `GO` і натиснути `Reset`, потім відтиснути `GO`. Контролер перезавантажиться і M5Burner зможе ідентифікувати плату.
 
-Тепер можно завантажити пакет CircuitPython та встановити. Після встановлення та перезавантаження контроллер іденифікується як USB-накопичувач. На цьому накопичувачі нас цікавлять два файли `settings.toml` та `code.py`.
+Тепер можно завантажити пакет CircuitPython та встановити. Після встановлення та перезавантаження контроллер іденифікується як USB-накопичувач. На цьому накопичувачі нас цікавлять два файли `settings.toml` та `code.py`. Для редагування файлів я рекомендую виокристовувати [VSCode](https://code.visualstudio.com/) та розширення [CircuitPython](https://marketplace.visualstudio.com/items/?itemName=joedevivo.vscode-circuitpython). Після встановлення розширення відкрийте накопичувач в якості проєкту VSCode і після цього встановіть необхідні бібліотеки, натиснувши `Ctrl+P` та введіть `> CircuitPython: Show Available Libraries` і виберіть наступні: `adafruit_connection_manager`, `adafruit_requests`.
 
 В файлі `settings.toml` додайте налаштування підключення до Wi-Fi:
 

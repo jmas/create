@@ -58,7 +58,7 @@ pool = socketpool.SocketPool(wifi.radio)
 print(f"Connect: {FTP_SERVER}:{FTP_PORT}")
 
 sock = pool.socket()
-sock.connect(("ftp1.camera-ftp.com", 21))  # Підключення до FTP-сервера
+sock.connect((FTP_SERVER, FTP_PORT))  # Підключення до FTP-сервера
 
 print(f"\nUSER...")
 

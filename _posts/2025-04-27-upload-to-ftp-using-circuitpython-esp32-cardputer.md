@@ -95,7 +95,7 @@ if "227 Entering Passive Mode" in response_str:
     data_sock = pool.socket()
     data_sock.connect((ip_address, port))
 
-    print(f"\nSTOR...")
+    print("\nSTOR...")
 
     # Вивантажуємо файл
     b = bytearray(512)

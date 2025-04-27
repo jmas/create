@@ -85,6 +85,7 @@ sock.send(b"PASV\r\n")
 response = sock.recv_into(b, 512)
 response_str = b.decode('ascii')
 print(response_str)
+
 if "227 Entering Passive Mode" in response_str:
     # Витягуємо IP і порт з відповіді
     parts = response_str.split('(')[1].split(')')[0].split(',')

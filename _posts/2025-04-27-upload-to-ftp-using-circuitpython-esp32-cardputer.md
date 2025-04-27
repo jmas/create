@@ -34,7 +34,6 @@ REMOTE_FILENAME="test.jpg"
  
  ```py
 import os
-import time
 import adafruit_connection_manager
 import wifi
 import adafruit_requests

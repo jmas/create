@@ -60,21 +60,21 @@ print(f"Connect: {FTP_SERVER}:{FTP_PORT}")
 sock = pool.socket()
 sock.connect((FTP_SERVER, FTP_PORT))  # Підключення до FTP-сервера
 
-print(f"\nUSER...")
+print("\nUSER...")
 
 sock.send(f"USER {FTP_USERNAME}\r\n".encode())
 b = bytearray(512)
 response = sock.recv_into(b, 512)
 print(b.decode('ascii'))
 
-print(f"\nPASS...")
+print("\nPASS...")
 
 b = bytearray(512)
 sock.send(f"PASS {FTP_PASSWORD}\r\n".encode())
 response = sock.recv_into(b, 512)
 print(b.decode('ascii'))
 
-print(f"\nRad image file data...")
+print("\nRead image file data...")
 
 with open(REMOTE_FILENAME, "rb") as image_file:
   image_data = image_file.read()
@@ -103,21 +103,21 @@ if "227 Entering Passive Mode" in response_str:
     response = sock.recv_into(b, 512)
     print(b.decode('ascii'))
 
-    print(f"\nSend image data...")
+    print("\nSend image data...")
 
     data_sock.send(image_data)
     data_sock.close()
 else:
     print("Error: PASV command failed.")
 
-print(f"\nQUIT...")
+print("\nQUIT...")
 
 b = bytearray(512)
 sock.send(b"QUIT\r\n")
 response = sock.recv_into(b, 512)
 print(b.decode('ascii'))
 
-print(f"\nEnd")
+print("\nEnd")
 
 sock.close()
  ```

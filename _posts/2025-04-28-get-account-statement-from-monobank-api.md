@@ -35,7 +35,7 @@ async function getClientInfo() {
 }
 ```
 
-## Крок 3: Отримання виписки за аккаунтом за один тиждень
+## Крок 3: Отримання виписки за аккаунтом за останній тиждень
 
 ```js
 async function getAccountStatement(account, from, to) {
@@ -50,11 +50,11 @@ async function getAccountStatement(account, from, to) {
 
 ## Як користуватися?
 
-Викликати функцію `console.log(await getClientInfo())` і отримати список аккаунтів і обрати ID потрібного. Далі виконати наступну функцію `console.log(await getAccountStatement('ACCOUNT_ID', new Date().getTime() - 24 * 60 * 60 * 1000 * 7, new Date().getTime())` і ви отримаєте виписку на 7 днів.
+Викликати функцію `console.log(await getClientInfo())` і отримати список аккаунтів і обрати ID потрібного. Далі виконати наступну функцію `console.log(await getAccountStatement('ACCOUNT_ID', new Date().getTime() - 24 * 60 * 60 * 1000 * 7, new Date().getTime())` і ви отримаєте виписку за отсанній тиждень.
 
 ## Як зберегти в CSV
 
-Наступний код збереже виписку у CSV файл.
+Наступний код збереже виписку у CSV файл `data.csv`.
 
 ```js
 try {
@@ -66,4 +66,4 @@ try {
   }
 ```
 
-В ідеалі можно автоматизувати витягання виписки і формування графіку для подальшого аналізу витрат.
+В ідеалі можно автоматизувати витягання виписки і формувати графік для подальшого аналізу витрат.

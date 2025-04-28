@@ -8,7 +8,7 @@ tags:
   - Python
   - ESP32
   - Cardputer
-date: 2025-04-27
+date: 2025-04-27T00:00:00.000Z
 ---
 Вже давно граюся з ESP32, котрий отртимує широкі можливості при використанні CircuitPython. CircuitPython це спеціальна версія мови программування Python опитимізована під велику кількість мікроконтролерів і дуже спрощує створення програм під мікроконтролери.
 
@@ -30,14 +30,16 @@ FTP_PASSWORD="<FTP пароль>"
 REMOTE_FILENAME="test.jpg"
 ```
 
- В файлі  `code.py` додайте наступний код:
+В файлі  `code.py` додайте наступний код:
  
- ```py
+```py
 import os
 import adafruit_connection_manager
 import wifi
 import adafruit_requests
 import socketpool
+import errno
+import time
 
 WIFI_SSID = os.getenv("CIRCUITPY_WIFI_SSID")
 WIFI_PASSWORD = os.getenv("CIRCUITPY_WIFI_PASSWORD")
@@ -85,6 +87,21 @@ response = sock.recv_into(b, 512)
 response_str = b.decode('ascii')
 print(response_str)
 
+def send_all(sock, data):
+    total_sent = 0
+    while total_sent < len(data):
+        try:
+            sent = sock.send(data[total_sent:])
+            if sent == 0:
+                raise RuntimeError("socket connection broken")
+            total_sent += sent
+        except OSError as e:
+            if e.errno == errno.EAGAIN:
+                # Немає місця в буфері, треба почекати
+                time.sleep(0.01)  # невелика пауза і спробувати знову
+            else:
+                raise  # якщо інша помилка — підняти її
+
 if "227 Entering Passive Mode" in response_str:
     # Витягуємо IP і порт з відповіді
     parts = response_str.split('(')[1].split(')')[0].split(',')
@@ -105,7 +122,13 @@ if "227 Entering Passive Mode" in response_str:
 
     print("\nSend image data...")
 
-    data_sock.send(image_data)
+    with open(REMOTE_FILENAME, "rb") as f:
+        while True:
+            chunk = f.read(512)
+            if not chunk:
+                break  # кінець файлу
+            send_all(data_sock, chunk)
+
     data_sock.close()
 else:
     print("Error: PASV command failed.")
@@ -120,8 +143,8 @@ print(b.decode('ascii'))
 print("\nEnd")
 
 sock.close()
- ```
+```
  
- Покладіть в корінь накопичувача будь який не порожній файл `test.jpg`.
+Покладіть в корінь накопичувача будь який не порожній файл `test.jpg`.
  
- Код підключеться до FTP та завантажить файл. Можно використовувати для завантаження фотографій з камери або для вивантаження даних з датчика.
+Код підключеться до FTP та завантажить файл. Можно використовувати для завантаження фотографій з камери або для вивантаження даних з датчика.

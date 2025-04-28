@@ -6,7 +6,7 @@ tags:
   - Monobank
   - Банкінг
   - NodeJS
-date: 2025-04-28
+date: 2025-04-28T00:00:00.000Z
 ---
 Вирішив витягти і збергіти у форматі CSV дані за власним рахунком. Потім ці дані можно візуалізувати у вигляді графіку і проаналізувати витрати з метою оптимізації.
 
@@ -58,7 +58,7 @@ async function getAccountStatement(account, from, to) {
 
 ```js
 try {
-    const data = await getAccountStatement('ACCOUNT_ID', new Date().getTime() - 24 * 60 * 60 * 1000 * 7), new Date().getTime());
+    const data = await getAccountStatement('ACCOUNT_ID', new Date().getTime() - 24 * 60 * 60 * 1000 * 7, new Date().getTime());
     const result = data.map((item) => `${item.time};${item.description};${item.amount};${item.balance}`).join('\n');
     fs.writeFileSync('./data.csv', result);
   } catch (error) {

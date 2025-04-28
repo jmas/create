@@ -76,11 +76,6 @@ sock.send(f"PASS {FTP_PASSWORD}\r\n".encode())
 response = sock.recv_into(b, 512)
 print(b.decode('ascii'))
 
-print("\nRead image file data...")
-
-with open(REMOTE_FILENAME, "rb") as image_file:
-  image_data = image_file.read()
-
 b = bytearray(512)
 sock.send(b"PASV\r\n")
 response = sock.recv_into(b, 512)

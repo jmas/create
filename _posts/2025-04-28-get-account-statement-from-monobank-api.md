@@ -50,7 +50,7 @@ async function getAccountStatement(account, from, to) {
 
 ## Як користуватися?
 
-Викликати функцію `console.log(await getClientInfo())` і отримати список аккаунтів і обрати ID потрібного. Далі виконати наступну функцію `console.log(await getAccountStatement('ACCOUNT_ID', new Date().getTime() - 24 * 60 * 60 * 1000 * 7), new Date().getTime())` і ви отримаєте виписку на 7 днів.
+Викликати функцію `console.log(await getClientInfo())` і отримати список аккаунтів і обрати ID потрібного. Далі виконати наступну функцію `console.log(await getAccountStatement('ACCOUNT_ID', new Date().getTime() - 24 * 60 * 60 * 1000 * 7, new Date().getTime())` і ви отримаєте виписку на 7 днів.
 
 ## Як зберегти в CSV
 

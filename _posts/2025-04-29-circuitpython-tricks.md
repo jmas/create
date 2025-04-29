@@ -742,3 +742,450 @@ while True:
 ```
 
 **Примітка:** з `adafruit_midi` потрібно імпортувати кожен тип MIDI повідомлення, який ви хочете обробляти.
+
+### Одночасне приймання MIDI через USB та MIDI через серійний UART
+
+MIDI є MIDI, тож ви можете використовувати або `midi_uart`, або `usb_midi.ports[]`, створені вище, разом з adafruit_midi. Ось приклад приймання MIDI як з USB, так і з серійного порту на QTPy RP2040. Зверніть увагу: для приймання серійного MIDI потрібне відповідне вхідне коло з оптоізолятором, наприклад, таке для QTPy або таке для MacroPad RP2040.
+
+```python
+import board, busio
+import usb_midi        # built-in library
+import adafruit_midi   # install with 'circup install adafruit_midi'
+from adafruit_midi.note_on import NoteOn
+from adafruit_midi.note_off import NoteOff
+
+uart = busio.UART(tx=board.TX, rx=board.RX, baudrate=31250, timeout=0.001)
+midi_usb = adafruit_midi.MIDI( midi_in=usb_midi.ports[0],  midi_out=usb_midi.ports[1] )
+midi_serial = adafruit_midi.MIDI( midi_in=uart, midi_out=uart )
+
+while True:
+    msg = midi_usb.receive()
+    if msg:
+        if isinstance(msg, NoteOn):
+            print("usb noteOn:",msg.note, msg.velocity)
+        elif isinstance(msg, NoteOff):
+            print("usb noteOff:",msg.note, msg.velocity)
+    msg = midi_serial.receive()
+    if msg:
+        if isinstance(msg, NoteOn):
+            print("serial noteOn:",msg.note, msg.velocity)
+        elif isinstance(msg, NoteOff):
+            print("serial noteOff:",msg.note, msg.velocity)
+```
+
+Якщо вам не важливо, звідки надходять MIDI-повідомлення, ви можете об'єднати два блоки if, використовуючи "оператор моржа" (`:=`).
+
+```python
+while True:
+    while msg := midi_usb.receive() or midi_uart.receive():
+        if isinstance(msg, NoteOn) and msg.velocity != 0:
+            note_on(msg.note, msg.velocity)
+        elif isinstance(msg,NoteOff) or isinstance(msg,NoteOn) and msg.velocity==0:
+            note_off(msg.note, msg.velocity)
+```
+
+### Увімкнути USB MIDI у файлі `boot.py` (для ESP32-S2 та STM32F4)
+
+Деякі пристрої на CircuitPython, зокрема на базі ESP32-S2, не мають достатньо USB-ендапойнтів для ввімкнення всіх USB-функцій, тому USB MIDI за замовчуванням вимкнено. Щоб його увімкнути, найпростіше — вимкнути підтримку USB HID (клавіатура/миша). Це потрібно зробити у файлі boot.py і перезавантажити плату.
+
+```python
+# boot.py
+import usb_hid
+import usb_midi
+usb_hid.disable()
+usb_midi.enable()
+print("enabled USB MIDI, disabled USB HID")
+```
+
+## Wi-Fi / Мережеве з'єднання
+
+### Сканування Wi-Fi мереж, відсортованих за рівнем сигналу
+
+**Примітка:** це для плат із вбудованим Wi-Fi (ESP32)
+
+```python
+import wifi
+networks = []
+for network in wifi.radio.start_scanning_networks():
+    networks.append(network)
+wifi.radio.stop_scanning_networks()
+networks = sorted(networks, key=lambda net: net.rssi, reverse=True)
+for network in networks:
+    print("ssid:",network.ssid, "rssi:",network.rssi)
+```
+
+### Підключитися до Wi-Fi мережі з найсильнішим сигналом
+
+```python
+import wifi
+
+def join_best_network(good_networks, print_info=False):
+    """join best network based on signal strength of scanned nets"""
+    networks = []
+    for network in wifi.radio.start_scanning_networks():
+        networks.append(network)
+    wifi.radio.stop_scanning_networks()
+    networks = sorted(networks, key=lambda net: net.rssi, reverse=True)
+    for network in networks:
+        if print_info: print("network:",network.ssid)
+        if network.ssid in good_networks:
+            if print_info: print("connecting to WiFi:", network.ssid)
+            try:
+                wifi.radio.connect(network.ssid, good_networks[network.ssid])
+                return True
+            except ConnectionError as e:
+                if print_info: print("connect error:",e)
+    return False
+
+good_networks = {"todbot1":"FiOnTheFly",  # ssid, password
+                 "todbot2":"WhyFlyWiFi",}
+connected = join_best_network(good_networks, print_info=True)
+if connected:
+    print("connected!")
+```
+
+### Пінг IP-адреси
+
+**Примітка:** це для плат з вбудованим Wi-Fi (ESP32)
+
+```python
+import os
+import time
+import wifi
+import ipaddress
+
+ip_to_ping = "1.1.1.1"
+
+wifi.radio.connect(ssid=os.getenv('CIRCUITPY_WIFI_SSID'),
+                   password=os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+
+print("my IP addr:", wifi.radio.ipv4_address)
+print("pinging ",ip_to_ping)
+ip1 = ipaddress.ip_address(ip_to_ping)
+while True:
+    print("ping:", wifi.radio.ping(ip1))
+    time.sleep(1)
+```
+
+### Отримати IP-адресу віддаленого хоста
+
+```python
+import os, wifi, socketpool
+
+wifi.radio.connect(ssid=os.getenv('CIRCUITPY_WIFI_SSID'),
+                   password=os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+print("my IP addr:", wifi.radio.ipv4_address)
+
+hostname = "todbot.com"
+
+pool = socketpool.SocketPool(wifi.radio)
+addrinfo = pool.getaddrinfo(host=hostname, port=443) # port is required
+print("addrinfo", addrinfo)
+
+ipaddr = addrinfo[0][4][0]
+
+print(f"'{hostname}' ip address is '{ipaddr}'")
+```
+
+### Отримати файл JSON
+
+Примітка: це для плат з вбудованим Wi-Fi (ESP32).
+
+```python
+import os
+import time
+import wifi
+import socketpool
+import ssl
+import adafruit_requests
+
+wifi.radio.connect(ssid=os.getenv('CIRCUITPY_WIFI_SSID'),
+                   password=os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+print("my IP addr:", wifi.radio.ipv4_address)
+pool = socketpool.SocketPool(wifi.radio)
+session = adafruit_requests.Session(pool, ssl.create_default_context())
+while True:
+    response = session.get("https://todbot.com/tst/randcolor.php")
+    data = response.json()
+    print("data:",data)
+    time.sleep(5)
+```
+
+### Надавати веб-сторінку через HTTP
+
+**Примітка:** це для плат з вбудованим Wi-Fi (ESP32)
+
+Бібліотека `adafruit_httpserver` робить це досить простим і має гарні приклади. Ви можете вказати їй використовувати `server.serve_forever()` і виконувати всі обчислення в функціях `@server.route()`, або використовувати `server.poll()` всередині циклу while. Також є бібліотека Ampule.
+
+```python
+import time, os, wifi, socketpool
+from adafruit_httpserver.server import HTTPServer
+from adafruit_httpserver.response import HTTPResponse
+
+my_port = 1234  # set this to your liking
+wifi.radio.connect(ssid=os.getenv('CIRCUITPY_WIFI_SSID'),
+                   password=os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+server = HTTPServer(socketpool.SocketPool(wifi.radio))
+
+@server.route("/")  # magic that attaches this function to "server" object
+def base(request):
+    my_str = f"<html><body><h1> Hello! Current time.monotonic is {time.monotonic()}</h1></body></html>"
+    return HTTPResponse(body=my_str, content_type="text/html")
+    # or for static content: return HTTPResponse(filename="/index.html")
+
+print(f"Listening on http://{wifi.radio.ipv4_address}:{my_port}")
+server.serve_forever(str(wifi.radio.ipv4_address), port=my_port) # never returns
+```
+
+### Встановити час RTC з NTP
+
+**Примітка:** це для плат з вбудованим Wi-Fi (ESP32)
+
+**Примітка:** Вам потрібно встановити my_tz_offset, щоб відповідати вашому регіону.
+
+```python
+# copied from:
+# https://docs.circuitpython.org/projects/ntp/en/latest/examples.html
+import time, os, rtc
+import socketpool, wifi
+import adafruit_ntp
+
+my_tz_offset = -7  # PDT
+
+wifi.radio.connect(ssid=os.getenv('CIRCUITPY_WIFI_SSID'),
+                   password=os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+print("Connected, getting NTP time")
+pool = socketpool.SocketPool(wifi.radio)
+ntp = adafruit_ntp.NTP(pool, tz_offset=my_tz_offset)
+
+rtc.RTC().datetime = ntp.datetime
+
+while True:
+    print("current datetime:", time.localtime())
+    time.sleep(5)
+```
+
+### Встановити час RTC з сервісу часу
+
+**Примітка:** це для плат з вбудованим Wi-Fi (ESP32)
+
+Це використовує чудовий і безкоштовний сайт WorldTimeAPI.org, і цей приклад отримуватиме поточний місцевий час (включаючи часовий пояс і UTC зсув) на основі геолокації IP-адреси вашого пристрою.
+
+```python
+import time, os, rtc
+import wifi, ssl, socketpool
+import adafruit_requests
+
+wifi.radio.connect(ssid=os.getenv('CIRCUITPY_WIFI_SSID'),
+                   password=os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+print("Connected, getting WorldTimeAPI time")
+pool = socketpool.SocketPool(wifi.radio)
+request = adafruit_requests.Session(pool, ssl.create_default_context())
+
+print("Getting current time:")
+response = request.get("http://worldtimeapi.org/api/ip")
+time_data = response.json()
+tz_hour_offset = int(time_data['utc_offset'][0:3])
+tz_min_offset = int(time_data['utc_offset'][4:6])
+if (tz_hour_offset < 0):
+    tz_min_offset *= -1
+unixtime = int(time_data['unixtime'] + (tz_hour_offset * 60 * 60)) + (tz_min_offset * 60)
+
+print(time_data)
+print("URL time: ", response.headers['date'])
+
+rtc.RTC().datetime = time.localtime( unixtime ) # create time struct and set RTC with it
+
+while True:
+  print("current datetime: ", time.localtime()) # time.* now reflects current local time
+  time.sleep(5)
+```
+
+### Що таке цей `settings.toml`?
+
+Це конфігураційний файл, який знаходиться поряд із вашим code.py і використовується для збереження облікових даних WiFi та інших глобальних налаштувань. Він також використовується (неявно) багатьма бібліотеками Adafruit, які працюють з WiFi. Ви можете використовувати його (як у наведених вище прикладах) без цих бібліотек. Імена налаштувань, що використовуються в CircuitPython, задокументовані в CircuitPython Web Workflow.
+
+Примітка: Ви можете використовувати будь-які імена змінних для своїх облікових даних WiFi (поширена пара — `WIFI_SSID` та `WIFI_PASSWORD`), але якщо ви використовуєте імена `CIRCUITPY_WIFI_*`, це також запустить Web Workflow.
+
+Використовувати його можна ось так для базової підключеності до WiFi:
+
+```python
+# settings.toml
+CIRCUITPY_WIFI_SSID = "PrettyFlyForAWiFi"
+CIRCUITPY_WIFI_PASSWORD = "mysecretpassword"
+
+# code.py
+import os, wifi
+print("connecting...")
+wifi.radio.connect(ssid=os.getenv('CIRCUITPY_WIFI_SSID'),
+                   password=os.getenv('CIRCUITPY_WIFI_PASSWORD'))
+print("my IP addr:", wifi.radio.ipv4_address)
+```
+
+### Що таке цей `secrets.py`?
+
+Це старіша версія ідеї `settings.toml`. Ви можете побачити старіший код, який використовує його.
+
+## Дисплеї (LCD / OLED / E-Ink) та displayio
+
+displayio — це рідний драйвер на системному рівні для дисплеїв у CircuitPython. Кілька плат CircuitPython (FunHouse, MagTag, PyGamer, CLUE) мають дисплеї на основі displayio та вбудований об'єкт board.DISPLAY, який попередньо налаштований для цього дисплея. Або ж можна додати власний дисплей на I2C або SPI.
+
+Отримати за замовчуванням дисплей та змінити його орієнтацію Плати, як-от FunHouse, MagTag, PyGamer, CLUE, мають вбудовані дисплеї. Параметр display.rotation працює з усіма дисплеями, не тільки з вбудованими.
+
+```python
+import board
+display = board.DISPLAY
+print(display.rotation) # print current rotation
+display.rotation = 0    # valid values 0,90,180,270
+```
+
+### Вивести зображення
+
+#### Використання `displayio.OnDiskBitmap`
+
+CircuitPython має вбудований парсер BMP, званий displayio.OnDiskBitmap: Зображення повинні бути у непотcompressed, палітизованому форматі BMP3. (як створювати BMP3 зображення)
+
+```python
+import board, displayio
+display = board.DISPLAY
+
+maingroup = displayio.Group() # everything goes in maingroup
+display.root_group = maingroup # show our maingroup (clears the screen)
+
+bitmap = displayio.OnDiskBitmap(open("my_image.bmp", "rb"))
+image = displayio.TileGrid(bitmap, pixel_shader=bitmap.pixel_shader)
+maingroup.append(image) # shows the image
+```
+
+#### Використання `adafruit_imageload`
+
+Ви також можете використовувати бібліотеку adafruit_imageload, яка підтримує дещо більше типів BMP файлів (але вони все одно повинні бути палітизованими BMP3 форматами, а також палітизованими PNG та GIF файлами). Який формат файлу вибрати?
+
+- BMP зображення більші, але завантажуються швидше.
+- PNG зображення приблизно в 2 рази менші за BMP і майже так само швидко завантажуються.
+- GIF зображення трохи більші за PNG, але значно повільніше завантажуються.
+
+```python
+import board, displayio
+import adafruit_imageload
+display = board.DISPLAY
+maingroup = displayio.Group() # everything goes in maingroup
+display.root_group = maingroup # set the root group to display
+bitmap, palette = adafruit_imageload.load("my_image.png")
+image = displayio.TileGrid(bitmap, pixel_shader=palette)
+maingroup.append(image) # shows the image
+```
+
+#### Як структурований displayio
+
+- Бібліотека displayio в CircuitPython працює таким чином:
+- Зображення Bitmap (та його Palette) розміщується всередині TileGrid.
+- TileGrid розміщується всередині Group.
+- Group відображається на Display.
+
+### Display background bitmap
+
+Корисно для відображення однотонного фону, який можна швидко змінити.
+
+```python
+import time, board, displayio
+display = board.DISPLAY         # get default display (FunHouse,Pygamer,etc)
+maingroup = displayio.Group()   # Create a main group to hold everything
+display.root_group = maingroup  # put it on the display
+
+# make bitmap that spans entire display, with 3 colors
+background = displayio.Bitmap(display.width, display.height, 3)
+
+# make a 3 color palette to match
+mypal = displayio.Palette(3)
+mypal[0] = 0x000000 # set colors (black)
+mypal[1] = 0x999900 # dark yellow
+mypal[2] = 0x009999 # dark cyan
+
+# Put background into main group, using palette to map palette ids to colors
+maingroup.append(displayio.TileGrid(background, pixel_shader=mypal))
+
+time.sleep(2)
+background.fill(2)  # change background to dark cyan (mypal[2])
+time.sleep(2)
+background.fill(1)  # change background to dark yellow (mypal[1])
+```
+
+Another way is to use `vectorio`:
+
+```python
+import board, displayio, vectorio
+
+display = board.DISPLAY  # built-in display
+maingroup = displayio.Group()   # a main group that holds everything
+display.root_group = maingroup  # put maingroup on the display
+
+mypal = displayio.Palette(1)
+mypal[0] = 0x999900
+background = vectorio.Rectangle(pixel_shader=mypal, width=display.width, height=display.height, x=0, y=0)
+maingroup.append(background)
+```
+
+Або можна також використовувати `adafruit_display_shapes`:
+
+```python
+import board, displayio
+from adafruit_display_shapes.rect import Rect
+
+display = board.DISPLAY
+maingroup = displayio.Group()   # a main group that holds everything
+display.root_group = maingroup  # add it to display
+
+background = Rect(0,0, display.width, display.height, fill=0x000000 ) # background color
+maingroup.append(background)
+```
+
+### Слайдшоу зображень
+
+```python
+import time, board, displayio
+import adafruit_imageload
+
+display = board.DISPLAY      # get display object (built-in on some boards)
+screen = displayio.Group()   # main group that holds all on-screen content
+display.root_group = screen  # add it to display
+
+file_names = [ '/images/cat1.bmp', '/images/cat2.bmp' ]  # list of filenames
+
+screen.append(displayio.Group())  # placeholder, will be replaced w/ screen[0] below
+while True:
+    for fname in file_names:
+        image, palette = adafruit_imageload.load(fname)
+        screen[0] = displayio.TileGrid(image, pixel_shader=palette)
+        time.sleep(1)
+```
+
+**Примітка:** Зображення повинні бути в палітизованому форматі BMP3. Для отримання додаткової інформації див. "Підготовка зображень для CircuitPython".
+
+### Вирішення помилки "Занадто швидке оновлення" для E-Ink
+
+Дисплеї E-Ink пошкоджуються, якщо їх оновлювати занадто часто. CircuitPython це обмежує, але також надає `display.time_to_refresh` — кількість секунд, яку потрібно почекати перед тим, як дисплей можна буде оновити. Одним із рішень є затримка на деякий час довше, ніж це значення, і ви ніколи не отримаєте помилку. Іншим варіантом є очікування, поки `time_to_refresh` не стане рівним нулю, як показано нижче.
+
+```python
+import time, board, displayio, terminalio
+from adafruit_display_text import label
+mylabel = label.Label(terminalio.FONT, text="demo", x=20,y=20,
+                      background_color=0x000000, color=0xffffff )
+display = board.DISPLAY  # e.g. for MagTag
+display.root_group = mylabel
+while True:
+    if display.time_to_refresh == 0:
+        display.refresh()
+    mylabel.text = str(time.monotonic())
+    time.sleep(0.1)
+```
+
+### Вимкнути REPL на вбудованому дисплеї
+
+Якщо у вас є плата з вбудованим дисплеєм (наприклад, Feather TFT, Cardputer, FunHouse тощо), CircuitPython налаштує дисплей для вас і виведе REPL на ньому. Але якщо ви хочете отримати більш акуратний вигляд для вашого проєкту, ви можете вимкнути виведення REPL на вбудованому дисплеї, додавши це на початок ваших файлів `boot.py` та `code.py`.
+
+```python
+# put at top of both boot.py & code.py 
+import board
+board.DISPLAY.root_group = None
+```

@@ -6,9 +6,9 @@ tags:
   - CircuitPython
   - Python
   - ESP32
-date: 2025-04-29
+date: 2025-04-29T00:00:00.000Z
 ---
-Переклад GitHub репозиторія (todbot/circuitpython-tricks)[https://github.com/todbot/circuitpython-tricks].
+Переклад GitHub репозиторія [todbot/circuitpython-tricks](https://github.com/todbot/circuitpython-tricks).
 
 ## Вхідні дані
 

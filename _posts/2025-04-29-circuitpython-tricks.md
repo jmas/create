@@ -518,3 +518,227 @@ while True:
 Примітка: Для файлів MP3 та налаштування `loop=True` при відтворенні є невелика затримка під час циклічного відтворення. Файли WAV повторюються без перерви.
 
 Приклад плат з `pwmio`, але без аудіо, — це плати на базі `ESP32-S2`, такі як `FunHouse`, де ви не можете відтворювати WAV-файли, але можете генерувати пісеньки. Більший приклад можна знайти за цим посиланням: [gist](https://gist.github.com/todbot/f35bb5ceed013a277688b2ca333244d5).
+
+## USB
+
+### Перейменувати диск CIRCUITPY на щось інше
+
+Наприклад, якщо у вас є кілька однакових пристроїв. Мітка може містити до 11 символів. Це потрібно записати в `boot.py`, а не в `code.py`, і ви повинні перезавантажити плату.
+
+```python
+# this goes in boot.py not code.py!
+new_name = "TRINKEYPY0"
+import storage
+storage.remount("/", readonly=False)
+m = storage.getmount("/")
+m.label = new_name
+storage.remount("/", readonly=True)
+```
+
+### Визначити, чи підключений USB чи ні
+
+```python
+import supervisor
+if supervisor.runtime.usb_connected:
+  led.value = True   # USB
+else:
+  led.value = False  # no USB
+```
+
+Старіший спосіб, який намагається змонтувати CIRCUITPY для читання та запису, і якщо це не вдається, то USB підключений:
+
+```python
+def is_usb_connected():
+    import storage
+    try:
+        storage.remount('/', readonly=False)  # attempt to mount readwrite
+        storage.remount('/', readonly=True)  # attempt to mount readonly
+    except RuntimeError as e:
+        return True
+    return False
+is_usb = "USB" if is_usb_connected() else "NO USB"
+print("USB:", is_usb)
+```
+
+### Отримати розмір диска CIRCUITPY та вільний простір
+
+```python
+import os
+fs_stat = os.statvfs('/')
+print("Disk size in MB", fs_stat[0] * fs_stat[2] / 1024 / 1024)
+print("Free space in MB", fs_stat[0] * fs_stat[3] / 1024 / 1024)
+```
+
+### Програмно скинути до завантажувача UF2
+
+```python
+import microcontroller
+microcontroller.on_next_reset(microcontroller.RunMode.UF2)
+microcontroller.reset()
+```
+
+**Примітка:** у старих версіях CircuitPython використовуйте `RunMode.BOOTLOADER`, а для плат з кількома завантажувачами (як-от ESP32-S2):
+
+```python
+import microcontroller
+microcontroller.on_next_reset(microcontroller.RunMode.BOOTLOADER)
+microcontroller.reset()
+```
+
+## USB Serial
+
+### Вивести в USB серійний порт
+
+```python
+print("hello there")  # prints a newline
+print("waiting...", end='')   # does not print newline
+for i in range(256):  print(i, end=', ')   # comma-separated numbers
+```
+
+### Читати ввід користувача з USB серійного порту, блокуючи
+
+```python
+while True:
+    print("Type something: ", end='')
+    my_str = input()  # type and press ENTER or RETURN
+    print("You entered: ", my_str)
+```
+
+### Читати ввід користувача з USB серійного порту, неблокуючи (переважно)
+
+```python
+import time
+import supervisor
+print("Type something when you're ready")
+last_time = time.monotonic()
+while True:
+    if supervisor.runtime.serial_bytes_available:
+        my_str = input()
+        print("You entered:", my_str)
+    if time.monotonic() - last_time > 1:  # every second, print
+        last_time = time.monotonic()
+        print(int(last_time),"waiting...")
+```
+
+### Читати клавіші з USB серійного порту
+
+```python
+import time, sys, supervisor
+print("type charactcers")
+while True:
+    n = supervisor.runtime.serial_bytes_available
+    if n > 0:  # we read something!
+        s = sys.stdin.read(n)  # actually read it in
+        # print both text & hex version of recv'd chars (see control chars!)
+        print("got:", " ".join("{:s} {:02x}".format(c,ord(c)) for c in s))
+    time.sleep(0.01) # do something else
+```
+
+### Читати ввід користувача з USB серійного порту, неблокуючи
+
+```python
+class USBSerialReader:
+    """ Read a line from USB Serial (up to end_char), non-blocking, with optional echo """
+    def __init__(self):
+        self.s = ''
+    def read(self,end_char='\n', echo=True):
+        import sys, supervisor
+        n = supervisor.runtime.serial_bytes_available
+        if n > 0:                    # we got bytes!
+            s = sys.stdin.read(n)    # actually read it in
+            if echo: sys.stdout.write(s)  # echo back to human
+            self.s = self.s + s      # keep building the string up
+            if s.endswith(end_char): # got our end_char!
+                rstr = self.s        # save for return
+                self.s = ''          # reset str to beginning
+                return rstr
+        return None                  # no end_char yet
+
+usb_reader = USBSerialReader()
+print("type something and press the end_char")
+while True:
+    mystr = usb_reader.read()  # read until newline, echo back chars
+    #mystr = usb_reader.read(end_char='\t', echo=False) # trigger on tab, no echo
+    if mystr:
+        print("got:",mystr)
+    time.sleep(0.01)  # do something time critical
+```
+
+## USB MIDI
+
+CircuitPython може бути MIDI контролером або відповідати на MIDI! Adafruit надає клас `adafruit_midi` для полегшення роботи, але він досить складний, порівняно з тим, як простий насправді MIDI.
+
+Для виведення MIDI ви можете вибрати роботу з сирими масивами байтів, оскільки більшість MIDI повідомлень складаються лише з 1, 2 або 3 байтів. Для читання MIDI ви можете знайти SmolMIDI від Winterbloom швидшим для розбору MIDI повідомлень, оскільки за своєю суттю він робить менше.
+
+### Відправка MIDI за допомогою `adafruit_midi`
+
+```python
+import usb_midi
+import adafruit_midi
+from adafruit_midi.note_on import NoteOn
+from adafruit_midi.note_off import NoteOff
+midi_out_channel = 3 # human version of MIDI out channel (1-16)
+midi = adafruit_midi.MIDI( midi_out=usb_midi.ports[1], out_channel=midi_out_channel-1)
+
+def play_note(note,velocity=127):
+    midi.send(NoteOn(note, velocity))  # 127 = highest velocity
+    time.sleep(0.1)
+    midi.send(NoteOff(note, 0))  # 0 = lowest velocity
+```
+
+**Примітка:** Цей шаблон також працює для відправки серійного (5-контактного) MIDI, див. нижче.
+
+### Відправка MIDI за допомогою масиву байтів
+
+Відправка MIDI за допомогою масиву байтів на нижчому рівні також досить проста і може забезпечити більшу швидкість для додатків, чутливих до часу. Цей код еквівалентний наведеному вище, без використання `adafruit_midi`.
+
+```python
+import usb_midi
+midi_out = usb_midi.ports[1]
+midi_out_channel = 3   # MIDI out channel (1-16)
+note_on_status = (0x90 | (midi_out_channel-1))
+note_off_status = (0x80 | (midi_out_channel-1))
+
+def play_note(note,velocity=127):
+    midi_out.write( bytearray([note_on_status, note, velocity]) )
+    time.sleep(0.1)
+    midi_out.write( bytearray([note_off_status, note, 0]) )
+```
+
+### MIDI через серійний UART
+
+Не зовсім USB, але це MIDI! Як `adafruit_midi`, так і техніка з масивами байтів також працюють для серійного MIDI (так званого "5-контактного MIDI"). За допомогою простого MIDI вихідного кола ви можете керувати старими апаратними синтезаторами.
+
+```python
+import busio
+midi_out_channel = 3  # MIDI out channel (1-16)
+note_on_status = (0x90 | (midi_out_channel-1))
+note_off_status = (0x80 | (midi_out_channel-1))
+# must pick board pins that are UART TX and RX pins
+midi_uart = busio.UART(tx=board.GP16, rx=board.GP17, baudrate=31250)
+
+def play_note(note,velocity=127):
+    midi_uart.write( bytearray([note_on_status, note, velocity]) )
+    time.sleep(0.1)
+    midi_uart.write( bytearray([note_off_status, note, 0]) )
+```
+
+### Приймання MIDI
+
+```python
+import usb_midi        # built-in library
+import adafruit_midi   # install with 'circup install adafruit_midi'
+from adafruit_midi.note_on import NoteOn
+from adafruit_midi.note_off import NoteOff
+
+midi_usb = adafruit_midi.MIDI(midi_in=usb_midi.ports[0])
+while True:
+    msg = midi_usb.receive()
+    if msg:
+        if isinstance(msg, NoteOn):
+            print("usb noteOn:",msg.note, msg.velocity)
+        elif isinstance(msg, NoteOff):
+            print("usb noteOff:",msg.note, msg.velocity)
+```
+
+**Примітка:** з `adafruit_midi` потрібно імпортувати кожен тип MIDI повідомлення, який ви хочете обробляти.

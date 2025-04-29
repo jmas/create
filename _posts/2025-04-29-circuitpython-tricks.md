@@ -385,9 +385,136 @@ while True:
     time.sleep(0.1)
 ```
 
-#### Примітки:
+**Примітки:**
 
-- При відтворенні аудіо буде невеликий "поп", коли аудіо починає відтворюватися, оскільки драйвер PWM переводить лінію GPIO з неактивного стану в PWM-режим. Наразі немає способу уникнути цього. Якщо відтворюється кілька WAV-файлів, рекомендується використовувати **AudioMixer**, щоб підтримувати аудіо систему між відтвореннями WAV. Таким чином, ви будете чути тільки стартовий "поп".
+- При відтворенні аудіо буде невеликий "поп", коли аудіо починає відтворюватися, оскільки драйвер PWM переводить лінію GPIO з неактивного стану в PWM-режим. Наразі немає способу уникнути цього. Якщо відтворюється кілька WAV-файлів, рекомендується використовувати `AudioMixer`, щоб підтримувати аудіо систему між відтвореннями WAV. Таким чином, ви будете чути тільки стартовий "поп".
 - Якщо ви хочете стерео-виведення на платах, які це підтримують, то можна передати два піні, наприклад: `audio = audiopwmio.PWMAudioOut(left_channel=board.GP14, right_channel=board.GP15)`.
 - Виведення PWM повинно бути відфільтроване та перетворене на лінійний рівень для використання. Використовуйте RC-ланцюг для цього, дивіться цю просту схему або цю тему в Twitter для деталей.
-- Об'єкт **WaveFile()** може приймати або потік файлів (вихід від **open('filewav', 'rb')**), або рядок з іменем файлу (наприклад, `wav = WaveFile("laser2.wav")`).
+- Об'єкт `WaveFile()` може приймати або потік файлів (вихід від `open('filewav', 'rb')`), або рядок з іменем файлу (наприклад, `wav = WaveFile("laser2.wav")`).
+
+### Аудіо виведення за допомогою DAC
+
+Деякі плати CircuitPython (SAMD51 "M4" та SAMD21 "M0") мають вбудовані DAC, які підтримуються. Код той самий, що й вище, лише змінюється рядок імпорту. Дивіться `audioio Support Matrix`, щоб дізнатися, які плати підтримують `audioio`.
+
+```python
+import time, board
+import audiocore, audioio # DAC
+wave_file = open("laser2.wav", "rb")
+wave = audiocore.WaveFile(wave_file)
+audio = audioio.AudioOut(board.A0)  # must be DAC-capable pin, A0 on QTPy Haxpress
+while True:
+  print("audio is playing:",audio.playing)
+  if not audio.playing:
+    audio.play(wave)
+    wave.sample_rate = int(wave.sample_rate * 0.90) # play 10% slower each time
+  time.sleep(0.1)
+```
+
+Примітка: якщо ви хочете стерео-виведення на платах, які це підтримують (переважно SAMD51 "M4"), ви можете передати два піні, наприклад: `audio = audioio.AudioOut(left_channel=board.A0, right_channel=board.A1)`.
+
+### Аудіо виведення за допомогою I2S
+
+На відміну від PWM або DAC, більшість плат CircuitPython підтримують керування зовнішньою аудіо платою через I2S. Це також дасть вам вищу якість звуку, ніж DAC або PWM. Дивіться `audiobusio Support Matrix`, щоб дізнатися, які плати підтримують `audiobusio`.
+
+```python
+# for e.g. Pico RP2040 pins bit_clock & word_select pins must be adjacent
+import board, audiobusio, audiocore
+audio = audiobusio.I2SOut(bit_clock=board.GP0, word_select=board.GP1, data=board.GP2)
+audio.play( audiocore.WaveFile("laser2.wav") )
+```
+
+### Використовуйте **audiomixer**, щоб запобігти тріщинам в аудіо
+
+За замовчуванням буфер, що використовується аудіо-системою, є досить малим. Це означає, що ви почуєте спотворене аудіо, якщо CircuitPython виконує інші операції (наприклад, запис на CIRCUITPY, оновлення дисплея). Щоб уникнути цього, ви можете використовувати `audiomixer`, щоб збільшити розмір аудіо-буфера. Почніть з `buffer_size=2048`. Більший буфер означає більшу затримку між тим, коли звук ініціюється, і коли він чується.
+
+`AudioMixer` також відмінно підходить, якщо ви хочете відтворювати кілька WAV-файлів одночасно.
+
+```python
+import time, board
+from audiocore import WaveFile
+from audioio import AudioOut
+import audiomixer
+wave = WaveFile("laser2.wav", "rb")
+audio = AudioOut(board.A0) # assuming QTPy M0 or Itsy M4
+mixer = audiomixer.Mixer(voice_count=1, sample_rate=22050, channel_count=1,
+                         bits_per_sample=16, samples_signed=True, buffer_size=2048)
+audio.play(mixer)  # never touch "audio" after this, use "mixer"
+while True:
+    print("mixer voice is playing:", mixer.voice[0].playing)
+    if not mixer.voice[0].playing:
+      time.sleep(1)
+      print("playing again")
+      mixer.voice[0].play(wave)
+    time.sleep(0.1)
+```
+
+### Відтворення кількох звуків за допомогою `audiomixer`
+
+Цей приклад припускає, що WAV-файли моно, з частотою дискретизації 22050 Гц та підписаними 16-бітовими зразками.
+
+```python
+import time, board, audiocore, audiomixer
+from audiopwmio import PWMAudioOut as AudioOut
+
+wav_files = ("loop1.wav", "loop2.wav", "loop3.wav")
+wavs = [None] * len(wav_files)  # holds the loaded WAVs
+
+audio = AudioOut(board.GP2)  # RP2040 example
+mixer = audiomixer.Mixer(voice_count=len(wav_files), sample_rate=22050, channel_count=1,
+                         bits_per_sample=16, samples_signed=True, buffer_size=2048)
+audio.play(mixer)  # attach mixer to audio playback
+
+for i in range(len(wav_files)):
+    print("i:",i)
+    wavs[i] = audiocore.WaveFile(open(wav_files[i], "rb"))
+    mixer.voice[i].play( wavs[i], loop=True) # start each one playing
+
+while True:
+    print("doing something else while all loops play")
+    time.sleep(1)
+```
+
+**Примітка:** Плати M0 не мають `audiomixer`.
+
+Примітка: Кількість одночасних звуків обмежена частотою дискретизації та швидкістю зчитування флеш-пам'яті. Орієнтовні правила:
+
+- Вбудована флеш-пам'ять: 10 звуків 22 кГц одночасно
+- SPI SD карти: 2 звуки 22 кГц одночасно
+
+Також дивіться численні приклади в `larger-tricks`.
+
+### Відтворення файлів MP3
+
+Після того, як ви налаштуєте виведення аудіо (безпосередньо або через `AudioMixer`), ви зможете відтворювати файли WAV або MP3 через нього, або відтворювати обидва файли одночасно.
+
+Наприклад, ось приклад, який використовує `I2SOut` для підключення до `PCM5102` на Raspberry Pi Pico RP2040 для одночасного відтворення як WAV, так і MP3:
+
+```python
+import board, audiobusio, audiocore, audiomp3
+num_voices = 2
+
+i2s_bclk, i2s_wsel, i2s_data = board.GP9, board.GP10, board.GP11 # BCLK, LCLK, DIN on PCM5102
+
+audio = audiobusio.I2SOut(bit_clock=i2s_bclk, word_select=i2s_wsel, data=i2s_data)
+mixer = audiomixer.Mixer(voice_count=num_voices, sample_rate=22050, channel_count=1,
+                         bits_per_sample=16, samples_signed=True)
+audio.play(mixer) # attach mixer to audio playback
+
+wav_file = "/amen1_22k_s16.wav" # in 'circuitpython-tricks/larger-tricks/breakbeat_wavs'
+mp3_file = "/vocalchops476663_22k_128k.mp3" # in 'circuitpython-tricks/larger-tricks/wav'
+# https://freesound.org/people/f-r-a-g-i-l-e/sounds/476663/
+
+wave = audiocore.WaveFile(open(wav_file, "rb"))
+mp3 = audiomp3.MP3Decoder(open(mp3_file, "rb"))
+mixer.voice[0].play( wave )
+mixer.voice[1].play( mp3 )
+
+while True:
+    pass   # both audio files play
+```
+
+Примітка: Для файлів MP3 майте на увазі, що оскільки декодування MP3 здійснюється програмно, вам, ймовірно, доведеться перетискувати MP3 до нижчого бітрейту та частоти дискретизації (макс. 128 кбіт/с та 22 050 Гц), щоб вони могли відтворюватися на пристроях CircuitPython нижчого класу, таких як Pico / RP2040.
+
+Примітка: Для файлів MP3 та налаштування `loop=True` при відтворенні є невелика затримка під час циклічного відтворення. Файли WAV повторюються без перерви.
+
+Приклад плат з `pwmio`, але без аудіо, — це плати на базі `ESP32-S2`, такі як `FunHouse`, де ви не можете відтворювати WAV-файли, але можете генерувати пісеньки. Більший приклад можна знайти за цим посиланням: [gist](https://gist.github.com/todbot/f35bb5ceed013a277688b2ca333244d5).

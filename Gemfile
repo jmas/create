@@ -8,7 +8,7 @@ gem "jekyll-theme-chirpy", "~> 7.2", ">= 7.2.4"
 #   gem "html-proofer", "~> 5.0", group: :test
 # end
 
-group :development, :test do
+# group :development, :test do
   gem 'html-proofer', '5.0.10'
   gem 'async', '2.23.1'
   gem 'pdf-reader', '2.14.1'
@@ -29,7 +29,7 @@ group :development, :test do
   gem 'ethon', '0.16.0'
   gem 'fiber-local', '1.1.0'
   gem 'fiber-storage', '1.0.1'
-end
+# end
 
 platforms :mingw, :x64_mingw, :mswin, :jruby do
   gem "tzinfo", ">= 1", "< 3"

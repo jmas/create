@@ -120,10 +120,10 @@ comments:
     issue_term: # < url | pathname | title | ...>
   # Giscus options › https://giscus.app
   giscus:
-    repo: jmas/dev-blog # <gh-username>/<repo>
-    repo_id: R_kgDOMw4HCQ
+    repo: jmas/create # <gh-username>/<repo>
+    repo_id: R_kgDOM6Ucow
     category: Announcements
-    category_id: DIC_kwDOMw4HCc4Cie2e
+    category_id: DIC_kwDOM6Uco84Cjaqf
     mapping: pathname # optional, default to 'pathname'
     strict: # optional, default to '0'
     input_position: # optional, default to 'bottom'

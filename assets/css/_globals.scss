@@ -1,0 +1,32 @@
+#archives .year::after {
+  left: 16.5px;
+}
+
+#page-tag ul > li::before {
+  flex-shrink: 0;
+}
+
+#topbar-wrapper {
+  background-color: var(--main-bg);
+}
+
+@media (max-width: calc(849px)) {
+  #topbar-wrapper {
+    position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+}
+
+main {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 600 !important;
+  }
+}

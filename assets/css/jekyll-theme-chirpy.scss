@@ -1,0 +1,25 @@
+---
+---
+
+@use "abstracts/variables" with (
+  $sidebar-width: 80px,
+  $font-family-base: (
+    "Roboto",
+    sans-serif,
+  ),
+  $font-family-heading: (
+    "Roboto",
+    sans-serif,
+  )
+);
+
+@use "main
+{%- if jekyll.environment == " production " -%}
+  .bundle
+{%- endif -%}
+";
+
+/* append your custom style below */
+
+@use "globals";
+@use "sidebar";

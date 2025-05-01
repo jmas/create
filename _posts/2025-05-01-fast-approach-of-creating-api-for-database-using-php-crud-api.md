@@ -33,14 +33,14 @@ PHP 7.2 або вище з увімкненими драйверами PDO дл�
 
 ```php
 $config = new Config([
-		'driver' => 'mysql',
-		'address' => 'mysql',
-		'port' => '3306',
-		'username' => 'sampleuser',
-		'password' => 'samplepassword',
-		'database' => 'sampledb',
-		'middlewares' => 'cors,json',
-		// 'debug' => false
+	'driver' => 'mysql',
+	'address' => 'mysql',
+	'port' => '3306',
+	'username' => 'sampleuser',
+	'password' => 'samplepassword',
+	'database' => 'sampledb',
+	'middlewares' => 'cors,json',
+	// 'debug' => false
 ]);
 ```
 

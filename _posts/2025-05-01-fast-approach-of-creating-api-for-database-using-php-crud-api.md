@@ -45,6 +45,6 @@ $config = new Config([
 ```
 
 Тепер API і сервісні інструменти доступно за наступними URL:
-- http://127.0.0.1:8080/records/
-- http://127.0.0.1:8080/swagger/
-- http://127.0.0.1:8080/dbadmin/
+- [http://127.0.0.1:8080/records/](http://127.0.0.1:8080/records/)
+- [http://127.0.0.1:8080/swagger/](http://127.0.0.1:8080/swagger/)
+- [http://127.0.0.1:8080/dbadmin/](http://127.0.0.1:8080/dbadmin/)

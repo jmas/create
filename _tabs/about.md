@@ -3,9 +3,8 @@ layout: page
 title: Про сайт
 permalink: /about/
 icon: fas fa-circle-info
-order: 4
+order: "4"
 ---
-
 Сайт представляє собою записник. В записнику збирається інформація з повсякденної розробки.
 Мета – збирати в одному місці практичні та корисні приклади кода, які можно повторити. Основні
 технології, які можно зустріти в записнику: HTML, CSS, JavaScript, React, NodeJS, PHP, Laravel, MySQL.
@@ -29,3 +28,7 @@ order: 4
 Мій Github з публічними проєктами – [@jmas](https://github.com/jmas).
 
 Можете відправити листа – [jmas.ukraine@gmail.com](mailto:jmas.ukraine@gmail.com).
+
+**Корисні посилання:**
+
+- [Білий каталог веб ресурсів](https://white-catalog.co.ua)

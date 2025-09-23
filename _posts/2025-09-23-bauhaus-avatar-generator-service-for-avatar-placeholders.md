@@ -8,7 +8,7 @@ tags:
   - Image Generation
   - SVG
   - Cloudflare
-date: 2025-09-23
+date: 2025-09-23T00:00:00.000Z
 ---
 Сервіс дозволяє згенерувати унікальну картинку в стилі баухаус з власною кольоровою темою. Створений для інтеграції з додатками де є багато користувачів і у деяких з них може не бути встановленого зображення профілю.
 
@@ -22,37 +22,17 @@ Github проєкту: https://github.com/jmas/bauhaus-avatar-generator
 <img src="https://bauhaus-avatar-generator.pp.ua/username.svg" />
 ```
 
-Приклад на React:
+Приклад на TypeScript:
 ```tsx
-import React from "react";
 import { generateSVG, GenerateOptions } from "bauhaus-avatar-generator";
 
-interface AvatarProps {
-  input: string;
-  options?: GenerateOptions;
-  className?: string;
-}
+// Generate with custom size
+const avatar = generateSVG("alice", { size: 256 });
 
-const Avatar: React.FC<AvatarProps> = ({
-  input,
-  options = { size: 200 },
-  className,
-}) => {
-  const svg = generateSVG(input, options);
-
-  return (
-    <div className={className} dangerouslySetInnerHTML={{ __html: svg }} />
-  );
-};
-
-// Usage
-<Avatar input="user@example.com" options={{ size: 150 }} />;
-<Avatar
-  input="user@example.com"
-  options={{
-    size: 150,
-    colors: ["#ff6b6b", "#4ecdc4", "#45b7d1"],
-    weights: [40, 30, 30],
-  }}
-/>;
+// Generate with custom colors and weights
+const avatar2 = generateSVG("bob", {
+  colors: ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#feca57"],
+  weights: [30, 25, 20, 15, 10],
+  size: 300,
+});
 ```

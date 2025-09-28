@@ -5,7 +5,7 @@ category: Проєкти
 tags:
   - DenoJS
   - JavaScript
-date: 2025-09-28
+date: 2025-09-28T00:00:00.000Z
 ---
 Зробив незамисловатий враппер, який являє собою детектор NSFW контента, тобто зображень сексуального та порнографічного характера. Цей детектор базується на TensorFlow AI модельці, яка представлена у вигляді пакету [nsfwjs](https://github.com/infinitered/nsfwjs).
 
@@ -21,8 +21,8 @@ const requestOptions = {
   redirect: "follow"
 };
 
-fetch("https://nsfw-detector-api.jmas.deno.net/", requestOptions)
-  .then((response) => response.text())
+fetch("https://nsfw-detector.ujournal.com.ua/", requestOptions)
+  .then((response) => response.json())
   .then((result) => console.log(result))
   .catch((error) => console.error(error));
 ```

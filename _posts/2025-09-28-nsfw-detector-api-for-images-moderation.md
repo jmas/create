@@ -64,3 +64,5 @@ fetch("https://nsfw-detector.ujournal.com.ua/", requestOptions)
 І загальна думка: моделька доволі дешева і доволі ефективна. Я захостив її на Deno Deploy і планую використовувати в CRON скрипті для неспішної модерації контента.
 
 Посилання на Github: [github.com/jmas/nsfw-detector-api](https://github.com/jmas/nsfw-detector-api)
+
+URL сервісу: [nsfw-detector.ujournal.com.ua](https://nsfw-detector.ujournal.com.ua)

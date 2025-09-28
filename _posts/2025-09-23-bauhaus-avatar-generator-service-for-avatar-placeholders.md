@@ -20,7 +20,7 @@ Github проєкту: [github.com/jmas/bauhaus-avatar-generator](https://github
 
 Приклад інтеграції:
 ```html
-<img src="https://bauhaus-avatar-generator.pp.ua/username.svg" />
+<img src="https://avatar-generator.ujournal.com.ua/username.svg" />
 ```
 
 Приклад на TypeScript:

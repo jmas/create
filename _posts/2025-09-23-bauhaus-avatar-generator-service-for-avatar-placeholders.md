@@ -8,13 +8,13 @@ tags:
   - Image Generation
   - SVG
   - Cloudflare
-date: 2025-09-23
+date: 2025-09-23T00:00:00.000Z
 ---
 Сервіс дозволяє згенерувати унікальну картинку в стилі баухаус з власною кольоровою темою. Створений для інтеграції з додатками де є багато користувачів і у деяких з них може не бути встановленого зображення профілю.
 
 Сервіс базується на NPM-пакеті, який я зібрав за допомогою CursorAI та Cloudflare Worker в якості бекенду. Код воркеру знаходиться в репозиторії проєкту. Пакет можно юзати і без звертання до сервісу, напряму встановивши пакет.
 
-Сайт сервісу з інструкцією як створити URL: [bauhaus-avatar-generator.pp.ua](https://bauhaus-avatar-generator.pp.ua)
+Сайт сервісу з інструкцією як створити URL: [bauhaus-avatar-generator.pp.ua](https://bauhaus-avatar-generator.pp.ua) або [avatar-generator.ujournal.com.ua](https://avatar-generator.ujournal.com.ua)
 
 Github проєкту: [github.com/jmas/bauhaus-avatar-generator](https://github.com/jmas/bauhaus-avatar-generator)
 

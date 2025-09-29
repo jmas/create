@@ -14,7 +14,7 @@ date: 2025-09-28
 
 ```js
 const formdata = new FormData();
-formdata.append("image", fileInput.files[0], "(m=eGM68f)(mh=YGlybUU_5R6MVJfb)0.jpg");
+formdata.append("image", fileInput.files[0], "nsfw-image.jpg");
 
 const requestOptions = {
   method: "POST",

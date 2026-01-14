@@ -13,7 +13,7 @@ order: "5"
   <dd id="sendor-hum"></dd>
   <dt>Тиск:</dt>
   <dd id="sendor-pres"></dd>
-</dl
+</dl>
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>

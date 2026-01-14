@@ -26,10 +26,10 @@
     });
     
     client.on('message', function (topic, message) {
-        document.getElementById('sens-temp').innerText = message.sn.BME280.Temperature;
-        document.getElementById('sens-hum').innerText = message.sn.BME280.Humidity; 
-        document.getElementById('sens-pres').innerText = message.sn.BME280.Pressure;
-        console.log(topic, message, message.toString());
+        const data = JSON.parse(message.toString());
+        document.getElementById('sens-temp').innerText = data.sn.BME280.Temperature;
+        document.getElementById('sens-hum').innerText = data.sn.BME280.Humidity; 
+        document.getElementById('sens-pres').innerText = data.sn.BME280.Pressure;
     });
     
     client.on('error', function (err) {

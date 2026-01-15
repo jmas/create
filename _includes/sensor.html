@@ -174,7 +174,7 @@
 
     async function drawChart() {
          try {
-             const response = await fetch(DATA_URL);
+             const response = await fetch(`${DATA_URL}?t=${new Date().getTime()}`);
              if (!response.ok) throw new Error('Помилка завантаження даних');
              const jsonData = await response.json();
 

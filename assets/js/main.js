@@ -196,7 +196,9 @@ async function drawChart() {
 
     const ctx = document.getElementById("sens-chart").getContext("2d");
 
-    jsonData.labels = jsonData.labels.map((label) => formatDateTime(label));
+    jsonData.labels = jsonData.labels.map((label) =>
+      formatDateTime(new Date(label))
+    );
 
     new Chart(ctx, {
       type: "line",

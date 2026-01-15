@@ -197,12 +197,11 @@
 
   /* CHART */
 
-  const DATA_URL =
-    "https://raw.githubusercontent.com/jmas/temperature-humidity-tracker/main/chart_data.json";
-
   async function drawChart() {
     try {
-      const response = await fetch(`${DATA_URL}?t=${new Date().getTime()}`);
+      const response = await fetch('https://api.github.com/repos/jmas/temperature-humidity-tracker/contents/chart_data.json', {
+          headers: { 'Accept': 'application/vnd.github.v3.raw' }
+      });      
 
       if (!response.ok) throw new Error("Помилка завантаження даних");
 

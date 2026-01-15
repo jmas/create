@@ -22,27 +22,26 @@
     const client = mqtt.connect('wss://81e95e73d74f4efd837464022a52355a.s1.eu.hivemq.cloud:8884/mqtt', options);
     
     client.on('connect', function () {
-        console.log('Connected to broker MQTT');
-        client.subscribe('tasmota/discovery/DCB4D98D7614/sensors', function (err) {
-            if (!err) {
-            }
+        console.info('Connected to broker MQTT');
+        client.subscribe('tele/tasmota_8D7614/SENSOR', function (err) {
+            console.info('Error?', err);
         });
     });
     
     client.on('message', function (topic, message) {
         const data = JSON.parse(message.toString());
 
-        messages.set(new Date(data.sn.Time), data);
+        console.info('Message', data);
+
+        messages.set(new Date(data.Time), data);
 
 	const latestKey = Array.from(messages.keys()).sort().at(-1);
 	const latestMessage = messages.get(latestKey);
 
-	console.log(latestMessage);
-
-        document.getElementById('sens-date').innerText = data.sn.Time;
-        document.getElementById('sens-temp').innerText = data.sn.BME280.Temperature;
-        document.getElementById('sens-hum').innerText = data.sn.BME280.Humidity; 
-        document.getElementById('sens-pres').innerText = data.sn.BME280.Pressure;
+        document.getElementById('sens-date').innerText = latestMessage.Time;
+        document.getElementById('sens-temp').innerText = latestMessage.BME280.Temperature;
+        document.getElementById('sens-hum').innerText = latestMessage.BME280.Humidity; 
+        document.getElementById('sens-pres').innerText = latestMessage.BME280.Pressure;
     });
     
     client.on('error', function (err) {

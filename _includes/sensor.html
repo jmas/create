@@ -202,9 +202,6 @@
     try {
       const response = await fetch(`${DATA_URL}?t=${new Date().getTime()}`, {
         cache: "no-store",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
       });
       if (!response.ok) throw new Error("Помилка завантаження даних");
       const jsonData = await response.json();

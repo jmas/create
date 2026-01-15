@@ -92,18 +92,26 @@ function formatTimeAgo(date) {
 }
 
 function formatDateTime(date) {
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
-  };
+  const now = new Date();
 
-  return new Intl.DateTimeFormat(document.documentElement.lang, options).format(
-    date
-  );
+  if (date.getDate() !== now.getDate()) {
+    return (
+      date.toLocaleDateString(document.documentElement.lang, {
+        day: "numeric",
+        month: "short",
+      }) +
+      " " +
+      date.toLocaleTimeString(document.documentElement.lang, {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    );
+  }
+
+  return date.toLocaleTimeString(document.documentElement.lang, {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 /* MAIN */
@@ -173,30 +181,6 @@ client.on("error", function (err) {
 
 /* CHART */
 
-const formatTasmotaDate = (dateStr) => {
-  const date = new Date(dateStr);
-  const now = new Date();
-
-  if (date.getDate() !== now.getDate()) {
-    return (
-      date.toLocaleDateString(document.documentElement.lang, {
-        day: "numeric",
-        month: "short",
-      }) +
-      " " +
-      date.toLocaleTimeString(document.documentElement.lang, {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    );
-  }
-
-  return date.toLocaleTimeString(document.documentElement.lang, {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-
 async function drawChart() {
   try {
     const response = await fetch(
@@ -212,7 +196,7 @@ async function drawChart() {
 
     const ctx = document.getElementById("sens-chart").getContext("2d");
 
-    jsonData.labels = jsonData.labels.map((label) => formatTasmotaDate(label));
+    jsonData.labels = jsonData.labels.map((label) => formatDateTime(label));
 
     new Chart(ctx, {
       type: "line",

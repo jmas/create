@@ -34,7 +34,7 @@
 
         messages.set(new Date(data.sn.Time), data);
 
-	const latestKey = messages.keys().sort();
+	const latestKey = Array.from(messages.keys()).sort().at(-1);
 	const latestMessage = messages.get(latestKey);
 
 	console.log(latestMessage);

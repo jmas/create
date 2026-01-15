@@ -11,6 +11,9 @@
   <dd id="sens-descr">Н/Д</dd>
 </dl>
 
+<canvas id="sens-chart" style="margin-top: 1rem; width: 80%; max-width: 800px;"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 
 <script>
@@ -163,5 +166,46 @@
     
     client.on('error', function (err) {
         console.error("Connection error: ", err);
-    });  
+    });
+
+    /* CHART */
+
+    const DATA_URL = 'https://raw.githubusercontent.com/jmas/temperature-humidity-tracker/main/chart_data.json';
+
+    async function drawChart() {
+         try {
+             // 1. Отримуємо дані з іншого репозиторію
+             const response = await fetch(DATA_URL);
+             if (!response.ok) throw new Error('Помилка завантаження даних');
+             const jsonData = await response.json();
+
+             // 2. Ініціалізуємо графік
+             const ctx = document.getElementById('sens-chart').getContext('2d');
+             new Chart(ctx, {
+                 type: 'line',
+                 data: jsonData, // Використовуємо структуру прямо з вашого JSON
+                 options: {
+                     responsive: true,
+                     scales: {
+                         x: {
+                             title: { display: true, text: 'Час (Tasmota)' }
+                         },
+                         y: {
+                             beginAtZero: false,
+                             title: { display: true, text: 'Значення' }
+                         }
+                     },
+                     plugins: {
+                         legend: { position: 'top' },
+                         title: { display: true, text: 'Температура та Вологість' }
+                     }
+                 }
+            });
+         } catch (error) {
+             console.error('Помилка:', error);
+             document.body.innerHTML += `<p style="color:red">Не вдалося завантажити дані: ${error.message}</p>`;
+         }
+     }
+
+     drawChart();
 </script>

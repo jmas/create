@@ -11,6 +11,35 @@
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
+    const rtf = new Intl.RelativeTimeFormat(document.documentElement.lang, { numeric: "auto" });
+
+    function formatTimeAgo(date) {
+      const now = new Date();
+      const diffInMilliseconds = now - date;
+      const seconds = Math.floor(diffInMilliseconds / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const months = Math.floor(days / 30); // Note: Simplified month calculation
+      const years = Math.floor(months / 12);
+
+      if (years > 0) {
+          return rtf.format(-years, "year");
+      } else if (months > 0) {
+          return rtf.format(-months, "month");
+      } else if (days > 0) {
+          return rtf.format(-days, "day");
+      } else if (hours > 0) {
+          return rtf.format(-hours, "hour");
+      } else if (minutes > 0) {
+          return rtf.format(-minutes, "minute");
+      } else {
+          return rtf.format(-seconds, "second");
+      }
+    }
+
+    /* MAIN */
+
     const messages = new Map();
 
     const dateOptions = {
@@ -46,7 +75,7 @@
 	const latestMessage = messages.get(latestKey);
 	const date = new Date(latestMessage.Time);
 
-        document.getElementById('sens-date').innerText = `${new Intl.DateTimeFormat(document.documentElement.lang, dateOptions).format(date)} ${new TimeAgo(document.documentElement.lang).format(date)}`;
+        document.getElementById('sens-date').innerText = `${new Intl.DateTimeFormat(document.documentElement.lang, dateOptions).format(date)} ${formatTimeAgo(date)}`;
         document.getElementById('sens-temp').innerText = latestMessage.BME280.Temperature;
         document.getElementById('sens-hum').innerText = latestMessage.BME280.Humidity; 
         document.getElementById('sens-pres').innerText = latestMessage.BME280.Pressure;

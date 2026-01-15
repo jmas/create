@@ -13,6 +13,13 @@
 <script>
     const messages = new Map();
 
+    const dateOptions = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    };
+
     const options = {
         username: 'website',
         password: 'SKQCWqw6e8JW6Gj',
@@ -37,8 +44,9 @@
 
 	const latestKey = Array.from(messages.keys()).sort().at(-1);
 	const latestMessage = messages.get(latestKey);
+	const date = new Date(obj.Time);
 
-        document.getElementById('sens-date').innerText = latestMessage.Time;
+        document.getElementById('sens-date').innerText = `${new Intl.DateTimeFormat(document.documentElement.lang, dateOptions).format(date)} ${new TimeAgo(document.documentElement.lang).format(date)}`;
         document.getElementById('sens-temp').innerText = latestMessage.BME280.Temperature;
         document.getElementById('sens-hum').innerText = latestMessage.BME280.Humidity; 
         document.getElementById('sens-pres').innerText = latestMessage.BME280.Pressure;

@@ -11,6 +11,8 @@
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
+    const messages = new Map();
+
     const options = {
         username: 'website',
         password: 'SKQCWqw6e8JW6Gj',
@@ -29,6 +31,14 @@
     
     client.on('message', function (topic, message) {
         const data = JSON.parse(message.toString());
+
+        messages.set(new Date(data.sn.Time), data);
+
+	const latestKey = messages.keys().sort();
+	const latestMessage = messages.get(latestKey);
+
+	console.log(latestMessage);
+
         document.getElementById('sens-date').innerText = data.sn.Time;
         document.getElementById('sens-temp').innerText = data.sn.BME280.Temperature;
         document.getElementById('sens-hum').innerText = data.sn.BME280.Humidity; 

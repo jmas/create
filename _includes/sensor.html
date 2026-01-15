@@ -15,58 +15,60 @@
 <script>
 const weatherFeelings = [
   {
-    condition: (t, h) => t < 0,
-    text: "Екстремальний холод: високий ризик обмороження, організм активно спалює калорії для обігріву."
+    condition: (t, h) => t < 16,
+    color: "#3498db",
+    text: "Занадто холодно для житла: ризик респіраторних захворювань, організм не відпочиває. Потрібен обігрів."
   },
   {
-    condition: (t, h) => t >= 0 && t < 10 && h > 70,
-    text: "Пронизлива вогкість: холодне вологе повітря інтенсивно відбирає тепло, відчувається холодніше, ніж є насправді."
+    condition: (t, h) => t >= 16 && t < 18,
+    color: "#5dade2",
+    text: "Гранична прохолода: допустима температура для міцного сну в теплій піжамі, але занизька для сидячої роботи."
   },
   {
-    condition: (t, h) => t >= 0 && t < 12 && h <= 70,
-    text: "Холодно та свіжо: прийнятний рівень для активного руху, але потребує багатошарового одягу."
+    condition: (t, h) => t >= 18 && t <= 20 && h >= 40 && h <= 60,
+    color: "#2ecc71",
+    text: "Здоровий мікроклімат: ідеально для сну та бадьорості. Слизові оболонки не пересихають."
   },
   {
-    condition: (t, h) => t >= 12 && t < 18,
-    text: "Бадьора прохолода: ідеально для фізичної активності, дихання легке, організм у тонусі."
+    condition: (t, h) => t > 20 && t <= 23 && h >= 35 && h <= 55,
+    color: "#27ae60",
+    text: "Оптимальний комфорт: стандартна температура для домашнього відпочинку в легкому одязі."
   },
   {
-    condition: (t, h) => t >= 18 && t < 22 && h <= 60,
-    text: "Легкий комфорт: оптимальний стан для відпочинку, концентрація уваги на високому рівні."
+    condition: (t, h) => t > 18 && t <= 24 && h < 30,
+    color: "#f39c12",
+    text: "Занадто сухо: подразнення очей та носоглотки. Рекомендовано увімкнути зволожувач."
   },
   {
-    condition: (t, h) => t >= 22 && t <= 25 && h >= 30 && h <= 55,
-    text: "Термічна нейтральність: ідеальний баланс, серцево-судинна система працює в економному режимі."
+    condition: (t, h) => t >= 18 && t <= 24 && h > 65,
+    color: "#9b59b6",
+    text: "Сирість: ризик появи плісняви на стінах та важкість дихання. Потрібне провітрювання."
   },
   {
-    condition: (t, h) => t > 25 && t <= 28 && h <= 50,
-    text: "Приємне тепло: відчувається літній комфорт, механізми терморегуляції працюють м'яко."
+    condition: (t, h) => t > 24 && t <= 27 && h <= 50,
+    color: "#e67e22",
+    text: "Теплувато: працездатність починає падати, організм може відчувати легку втому."
   },
   {
-    condition: (t, h) => t >= 23 && t <= 27 && h > 65,
-    text: "Млява задуха: через вологість випаровування поту ускладнене, можливе відчуття сонливості."
+    condition: (t, h) => t > 24 && t <= 28 && h > 55,
+    color: "#d35400",
+    text: "Душно: поєднання тепла та вологи. Повітря здається 'важким', важко зосередитися."
   },
   {
-    condition: (t, h) => t > 28 && t <= 33 && h <= 40,
-    text: "Суха спека: навантаження на серце зростає, необхідно збільшити споживання води."
-  },
-  {
-    condition: (t, h) => t > 28 && t <= 34 && h > 40,
-    text: "Важка спека: ризик перегріву, судини розширені, працездатність суттєво знижується."
-  },
-  {
-    condition: (t, h) => t > 34 && h > 50,
-    text: "Критична задуха: ризик теплового удару, природне охолодження майже неможливе. Небезпечно для серця!"
-  },
-  {
-    condition: (t, h) => t > 34 && h <= 50,
-    text: "Екстремальна температура: організм працює на межі можливостей, інтенсивне потовиділення."
+    condition: (t, h) => t > 28,
+    color: "#e74c3c",
+    text: "Спекотно: високе навантаження на серце. Необхідне активне охолодження (кондиціонер/вентилятор)."
   }
 ];
 
 function getDetailedFeeling(temp, humidity) {
   const result = weatherFeelings.find(f => f.condition(temp, humidity));
   return result ? result.text : "Стан адаптації: організм підлаштовується під умови.";
+}
+
+function getDetailedFeelingColor(temp, humidity) {
+  const result = weatherFeelings.find(f => f.condition(temp, humidity));
+  return result ? result.color : "#000";
 }
 
     const rtf = new Intl.RelativeTimeFormat(document.documentElement.lang, { numeric: "auto" });
@@ -138,6 +140,7 @@ function getDetailedFeeling(temp, humidity) {
         document.getElementById('sens-hum').innerText = latestMessage.BME280.Humidity; 
         document.getElementById('sens-pres').innerText = latestMessage.BME280.Pressure;
         document.getElementById('sens-descr').innerText = getDetailedFeeling(latestMessage.BME280.Temperature, latestMessage.BME280.Humidity);
+        document.getElementById('sens-descr').style.color = getDetailedFeelingColor(latestMessage.BME280.Temperature, latestMessage.BME280.Humidity);
     });
     
     client.on('error', function (err) {

@@ -75,7 +75,7 @@
 	const latestMessage = messages.get(latestKey);
 	const date = new Date(latestMessage.Time);
 
-        document.getElementById('sens-date').innerText = `${new Intl.DateTimeFormat(document.documentElement.lang, dateOptions).format(date)} ${formatTimeAgo(date)}`;
+        document.getElementById('sens-date').innerText = `${new Intl.DateTimeFormat(document.documentElement.lang, dateOptions).format(date)} (${formatTimeAgo(date)})`;
         document.getElementById('sens-temp').innerText = latestMessage.BME280.Temperature;
         document.getElementById('sens-hum').innerText = latestMessage.BME280.Humidity; 
         document.getElementById('sens-pres').innerText = latestMessage.BME280.Pressure;

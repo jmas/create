@@ -1,4 +1,6 @@
 <dl>
+  <dt>Дата:</dt>
+  <dd id="sens-date">Н/Д</dd>
   <dt>Температура:</dt>
   <dd id="sens-temp">Н/Д</dd>
   <dt>Вологість:</dt>
@@ -27,6 +29,7 @@
     
     client.on('message', function (topic, message) {
         const data = JSON.parse(message.toString());
+        document.getElementById('sens-date').innerText = data.sn.Time;
         document.getElementById('sens-temp').innerText = data.sn.BME280.Temperature;
         document.getElementById('sens-hum').innerText = data.sn.BME280.Humidity; 
         document.getElementById('sens-pres').innerText = data.sn.BME280.Pressure;

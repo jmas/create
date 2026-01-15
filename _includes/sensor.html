@@ -44,7 +44,7 @@
 
 	const latestKey = Array.from(messages.keys()).sort().at(-1);
 	const latestMessage = messages.get(latestKey);
-	const date = new Date(obj.Time);
+	const date = new Date(latestMessage.Time);
 
         document.getElementById('sens-date').innerText = `${new Intl.DateTimeFormat(document.documentElement.lang, dateOptions).format(date)} ${new TimeAgo(document.documentElement.lang).format(date)}`;
         document.getElementById('sens-temp').innerText = latestMessage.BME280.Temperature;

@@ -7,10 +7,68 @@
   <dd id="sens-hum">Н/Д</dd>
   <dt>Тиск:</dt>
   <dd id="sens-pres">Н/Д</dd>
+  <dt>Опис:</dt>
+  <dd id="sens-descr">Н/Д</dd>
 </dl>
 
 <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
 <script>
+const weatherFeelings = [
+  {
+    condition: (t, h) => t < 0,
+    text: "Екстремальний холод: високий ризик обмороження, організм активно спалює калорії для обігріву."
+  },
+  {
+    condition: (t, h) => t >= 0 && t < 10 && h > 70,
+    text: "Пронизлива вогкість: холодне вологе повітря інтенсивно відбирає тепло, відчувається холодніше, ніж є насправді."
+  },
+  {
+    condition: (t, h) => t >= 0 && t < 12 && h <= 70,
+    text: "Холодно та свіжо: прийнятний рівень для активного руху, але потребує багатошарового одягу."
+  },
+  {
+    condition: (t, h) => t >= 12 && t < 18,
+    text: "Бадьора прохолода: ідеально для фізичної активності, дихання легке, організм у тонусі."
+  },
+  {
+    condition: (t, h) => t >= 18 && t < 22 && h <= 60,
+    text: "Легкий комфорт: оптимальний стан для відпочинку, концентрація уваги на високому рівні."
+  },
+  {
+    condition: (t, h) => t >= 22 && t <= 25 && h >= 30 && h <= 55,
+    text: "Термічна нейтральність: ідеальний баланс, серцево-судинна система працює в економному режимі."
+  },
+  {
+    condition: (t, h) => t > 25 && t <= 28 && h <= 50,
+    text: "Приємне тепло: відчувається літній комфорт, механізми терморегуляції працюють м'яко."
+  },
+  {
+    condition: (t, h) => t >= 23 && t <= 27 && h > 65,
+    text: "Млява задуха: через вологість випаровування поту ускладнене, можливе відчуття сонливості."
+  },
+  {
+    condition: (t, h) => t > 28 && t <= 33 && h <= 40,
+    text: "Суха спека: навантаження на серце зростає, необхідно збільшити споживання води."
+  },
+  {
+    condition: (t, h) => t > 28 && t <= 34 && h > 40,
+    text: "Важка спека: ризик перегріву, судини розширені, працездатність суттєво знижується."
+  },
+  {
+    condition: (t, h) => t > 34 && h > 50,
+    text: "Критична задуха: ризик теплового удару, природне охолодження майже неможливе. Небезпечно для серця!"
+  },
+  {
+    condition: (t, h) => t > 34 && h <= 50,
+    text: "Екстремальна температура: організм працює на межі можливостей, інтенсивне потовиділення."
+  }
+];
+
+function getDetailedFeeling(temp, humidity) {
+  const result = weatherFeelings.find(f => f.condition(temp, humidity));
+  return result ? result.text : "Стан адаптації: організм підлаштовується під умови.";
+}
+
     const rtf = new Intl.RelativeTimeFormat(document.documentElement.lang, { numeric: "auto" });
 
     function formatTimeAgo(date) {
@@ -79,6 +137,7 @@
         document.getElementById('sens-temp').innerText = `${latestMessage.BME280.Temperature > 0 ? '+' : '-'}${latestMessage.BME280.Temperature} °C`;
         document.getElementById('sens-hum').innerText = latestMessage.BME280.Humidity; 
         document.getElementById('sens-pres').innerText = latestMessage.BME280.Pressure;
+        document.getElementById('sens-descr').innerText = getDetailedFeeling(latestMessage.BME280.Temperature, latestMessage.BME280.Humidity);
     });
     
     client.on('error', function (err) {

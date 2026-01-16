@@ -90,7 +90,9 @@ function getDetailedFeelingColor(temp, humidity) {
 
 function getDetailedFeelingImage(temp, humidity) {
   const result = weatherFeelings.find((f) => f.condition(temp, humidity));
-  return result ? result.svgIcon : "";
+  return result
+    ? `<img src="${result.iconUrl}.svg" alt="${result.text ?? ""}" />`
+    : "";
 }
 
 /* DATE TIME UTILS */

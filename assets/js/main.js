@@ -5,7 +5,7 @@ const weatherFeelings = [
     condition: (t, h) => t <= 0,
     color: "#1a5276",
     text: "Критичне переохолодження: ризик замерзання труб та пошкодження конструкцій будівлі. Перебування без спецзасобів небезпечне.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12" y2="8"></line>
@@ -16,7 +16,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 0 && t <= 5,
     color: "#21618c",
     text: "Екстремальний холод: високий ризик гіпотермії. Організм витрачає всі ресурси на обігрів. Необхідне термінове опалення.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 10V8a2 2 0 0 0-2-2h-3.9a2 2 0 0 1-1.6-.8L10 2l-2.5 5.2a2 2 0 0 1-1.6.8H2a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2v4h4v-4h4v4h4v-4h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2z"></path>
                 <path d="M10 2h4"></path>
               </svg>`, // Куртка/одяг
@@ -25,7 +25,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 5 && t <= 10,
     color: "#2874a6",
     text: "Дуже холодно: небезпечно для людей похилого віку та дітей. Високий ризик конденсату та швидкого розвитку грибка.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
                 <path d="M12 6v6l4 2"></path>
               </svg>`, // Годинник/час
@@ -34,7 +34,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 10 && t < 16,
     color: "#2e86c1",
     text: "Сильний дискомфорт: організм не відновлюється під час сну. Необхідний інтенсивний обігрів та теплий багатошаровий одяг.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12" y2="8"></line>
@@ -45,7 +45,7 @@ const weatherFeelings = [
     condition: (t, h) => t >= 16 && t < 18,
     color: "#5dade2",
     text: "Гранична прохолода: допустима температура для міцного сну в теплій піжамі, але занизька для сидячої роботи.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
               </svg>`, // Змерзлі руки
@@ -54,7 +54,7 @@ const weatherFeelings = [
     condition: (t, h) => t >= 18 && t <= 20 && h >= 40 && h <= 60,
     color: "#2ecc71",
     text: "Здоровий мікроклімат: ідеально для сну та бадьорості. Слизові оболонки не пересихають.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>`, // Щит/захист
   },
@@ -62,7 +62,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 20 && t <= 23 && h >= 35 && h <= 55,
     color: "#27ae60",
     text: "Оптимальний комфорт: стандартна температура для домашнього відпочинку в легкому одязі.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
                 <line x1="9" y1="9" x2="9.01" y2="9"></line>
@@ -73,7 +73,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 18 && t <= 24 && h < 30,
     color: "#f39c12",
     text: "Занадто сухо: подразнення очей та носоглотки. Рекомендовано увімкнути зволожувач.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2a3 3 0 0 0-3 3v7c0 4.42 3.58 8 8 8h3V5c0-1.1-.9-2-2-2h-3a3 3 0 0 0-3-3z"></path>
                 <path d="M12 17a5 5 0 0 1-5-5V5a3 3 0 0 1 3-3h2"></path>
                 <line x1="12" y1="20" x2="12" y2="22"></line>
@@ -83,7 +83,7 @@ const weatherFeelings = [
     condition: (t, h) => t >= 18 && t <= 24 && h > 65,
     color: "#9b59b6",
     text: "Сирість: ризик появи плісняви на стінах та важкість дихання. Потрібне провітрювання.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 2a3 3 0 0 0-3 3v7c0 4.42 3.58 8 8 8h3V5c0-1.1-.9-2-2-2h-3a3 3 0 0 0-3-3z"></path>
                 <path d="M12 17a5 5 0 0 1-5-5V5a3 3 0 0 1 3-3h2"></path>
                 <line x1="12" y1="20" x2="12" y2="22"></line>
@@ -93,7 +93,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 24 && t <= 27 && h <= 50,
     color: "#e67e22",
     text: "Теплувато: працездатність починає падати, організм може відчувати легку втому.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12" y2="8"></line>
@@ -104,7 +104,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 24 && t <= 28 && h > 55,
     color: "#d35400",
     text: "Душно: поєднання тепла та вологи. Повітря здається 'важким', важко зосередитися.",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
               </svg>`, // Блискавка
   },
@@ -112,7 +112,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 28,
     color: "#e74c3c",
     text: "Спекотно: високе навантаження на серце. Необхідне активне охолодження (кондиціонер/вентилятор).",
-    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12" y2="8"></line>
@@ -247,10 +247,11 @@ client.on("message", function (topic, message) {
     latestMessage.BME280.Temperature,
     latestMessage.BME280.Humidity
   );
-  document.getElementById("sens-descr").style.color = getDetailedFeelingColor(
-    latestMessage.BME280.Temperature,
-    latestMessage.BME280.Humidity
-  );
+  document.getElementById("sens-descr").parentElement.style.color =
+    getDetailedFeelingColor(
+      latestMessage.BME280.Temperature,
+      latestMessage.BME280.Humidity
+    );
   document.getElementById("sens-img").innerHTML = getDetailedFeelingImage(
     latestMessage.BME280.Temperature,
     latestMessage.BME280.Humidity

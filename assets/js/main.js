@@ -19,7 +19,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 5 && t <= 10,
     color: "#2874a6",
     text: "Дуже холодно: небезпечно для людей похилого віку та дітей. Ризик конденсату.",
-    iconUrl: `${ICON_BASE_URL}/shrub.svg`, // Імітація інею/холодної природи
+    iconUrl: `${ICON_BASE_URL}/triangle-alert.svg`,
   },
   {
     condition: (t, h) => t > 10 && t < 16,
@@ -91,7 +91,9 @@ function getDetailedFeelingColor(temp, humidity) {
 function getDetailedFeelingImage(temp, humidity) {
   const result = weatherFeelings.find((f) => f.condition(temp, humidity));
   return result
-    ? `<img src="${result.iconUrl}.svg" alt="${result.text ?? ""}" />`
+    ? `<img src="${result.iconUrl}" alt="${
+        result.text ?? ""
+      }" width="24" height="24" />`
     : "";
 }
 

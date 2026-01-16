@@ -199,7 +199,7 @@ client.on("message", function (topic, message) {
   document.getElementById("sens-temp").innerText = `${
     latestMessage.BME280.Temperature > 0 ? "+" : "-"
   }${latestMessage.BME280.Temperature} °C`;
-  document.getElementById("sens-hum").innerText = latestMessage.BME280.Humidity;
+  document.getElementById("sens-hum").innerText = `${latestMessage.BME280.Humidity}%`;
   document.getElementById("sens-pres").innerText =
     latestMessage.BME280.Pressure;
   document.getElementById("sens-descr").innerText = getDetailedFeeling(

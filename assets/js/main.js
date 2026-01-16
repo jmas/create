@@ -25,7 +25,7 @@ const weatherFeelings = [
     condition: (t, h) => t > 10 && t < 16,
     color: "#2e86c1",
     text: "Сильний дискомфорт: організм не відновлюється під час сну. Потрібен обігрів.",
-    iconUrl: `${ICON_BASE_URL}/thermometer-snow.svg`,
+    iconUrl: `${ICON_BASE_URL}/thermometer.svg`,
   },
   {
     condition: (t, h) => t >= 16 && t < 18,

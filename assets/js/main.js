@@ -251,7 +251,7 @@ client.on("message", function (topic, message) {
     latestMessage.BME280.Temperature,
     latestMessage.BME280.Humidity
   );
-  document.getElementById("sens-img").style.color = getDetailedFeelingImage(
+  document.getElementById("sens-img").innerHTML = getDetailedFeelingImage(
     latestMessage.BME280.Temperature,
     latestMessage.BME280.Humidity
   );

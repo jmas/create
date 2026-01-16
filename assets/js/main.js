@@ -5,19 +5,19 @@ const weatherFeelings = [
     condition: (t, h) => t <= 0,
     color: "#1a5276",
     text: "Критичне переохолодження: ризик замерзання труб та пошкодження конструкцій будівлі.",
-    svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M5 9l14 6M5 15l14-6M2 12h20M12 2l2 2m-4 0l2-2M12 22l2-2m-4 0l2 2"/></svg>`, // Сніжинка
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M5 9l14 6M5 15l14-6M2 12h20M12 2l2 2m-4 0l2-2M12 22l2-2m-4 0l2 2"/></svg>`, // Сніжинка
   },
   {
     condition: (t, h) => t > 0 && t <= 5,
     color: "#21618c",
     text: "Екстремальний холод: високий ризик гіпотермії. Необхідне термінове опалення.",
-    svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 1 1 4 0Z"/><path d="M12 14v-4"/></svg>`, // Термометр низький
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 1 1 4 0Z"/><path d="M12 14v-4"/></svg>`, // Термометр низький
   },
   {
     condition: (t, h) => t > 5 && t <= 10,
     color: "#2874a6",
     text: "Дуже холодно: небезпечно для людей похилого віку та дітей. Ризик конденсату.",
-    svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9V2m0 20v-7m9-3h-7M2 12h7m1.5-6.5l2 2m3 3l2 2M6.5 17.5l2-2m3-3l2-2"/></svg>`, // Лід
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9V2m0 20v-7m9-3h-7M2 12h7m1.5-6.5l2 2m3 3l2 2M6.5 17.5l2-2m3-3l2-2"/></svg>`, // Лід
   },
   {
     condition: (t, h) => t > 10 && t < 16,
@@ -35,19 +35,19 @@ const weatherFeelings = [
     condition: (t, h) => t >= 18 && t <= 20 && h >= 40 && h <= 60,
     color: "#2ecc71",
     text: "Здоровий мікроклімат: ідеально для сну та бадьорості. Слизові не пересихають.",
-    svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>`, // Галочка/ОК
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 5 5L20 7"/></svg>`, // Галочка/ОК
   },
   {
     condition: (t, h) => t > 20 && t <= 23 && h >= 35 && h <= 55,
     color: "#27ae60",
     text: "Оптимальний комфорт: стандартна температура для відпочинку в легкому одязі.",
-    svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>`, // Смайл
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></svg>`, // Смайл
   },
   {
     condition: (t, h) => t > 18 && t <= 24 && h < 30,
     color: "#f39c12",
     text: "Занадто сухо: подразнення носоглотки. Рекомендовано зволожувач.",
-    svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5L12 2 8.1 9.5C6.1 11.1 5 13 5 15a7 7 0 0 0 7 7Z"/><path d="m13 14-2 4m0-4 2 4" stroke-width="1.5"/></svg>`, // Перекреслена крапля
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5L12 2 8.1 9.5C6.1 11.1 5 13 5 15a7 7 0 0 0 7 7Z"/><path d="m13 14-2 4m0-4 2 4" stroke-width="1.5"/></svg>`, // Перекреслена крапля
   },
   {
     condition: (t, h) => t >= 18 && t <= 24 && h > 65,
@@ -65,13 +65,13 @@ const weatherFeelings = [
     condition: (t, h) => t > 24 && t <= 28 && h > 55,
     color: "#d35400",
     text: "Душно: повітря здається 'важким', важко зосередитися.",
-    svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-4 3-4h14s3 4 3 4-3 4-3 4H5s-3-4-3-4Z"/><circle cx="12" cy="12" r="3"/></svg>`, // Важке повітря/око
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-4 3-4h14s3 4 3 4-3 4-3 4H5s-3-4-3-4Z"/><circle cx="12" cy="12" r="3"/></svg>`, // Важке повітря/око
   },
   {
     condition: (t, h) => t > 28,
     color: "#e74c3c",
     text: "Спекотно: високе навантаження на серце. Необхідне охолодження.",
-    svgIcon: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 2v20M2 12h20m-3.5-6.5-13 13m0-13 13 13" stroke="red"/></svg>`, // Небезпека/Спека
+    svgIcon: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 2v20M2 12h20m-3.5-6.5-13 13m0-13 13 13" stroke="red"/></svg>`, // Небезпека/Спека
   },
 ];
 

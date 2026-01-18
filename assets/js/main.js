@@ -194,7 +194,7 @@ client.on("message", function (topic, message) {
   const date = new Date(latestMessage.Time);
   
   document.getElementById("sens-power").innerText = latestMessage.Switch1 === 'ON' ? 'Є живлення' : 'Немає живлення';
-  document.getElementById("sens-power-img").innerHTML = latestMessage.Switch1 === 'ON' ? '<img src="https://unpkg.com/lucide-static@latest/icons/plug.svg" alt="Є живлення" width="24" height="24" />' : '<img src="https://unpkg.com/lucide-static@latest/icons/plug-off.svg" alt="Немає живлення" width="24" height="24" />';
+  document.getElementById("sens-power-img").innerHTML = latestMessage.Switch1 === 'ON' ? '<img src="https://unpkg.com/lucide-static@latest/icons/power.svg" alt="Є живлення" width="24" height="24" />' : '<img src="https://unpkg.com/lucide-static@latest/icons/power-off.svg" alt="Немає живлення" width="24" height="24" />';
   document.getElementById("sens-date").innerText = `${formatDateTime(
     date
   )} (${formatTimeAgo(date)})`;

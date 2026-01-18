@@ -377,6 +377,7 @@ async function drawChart() {
     );
 
     // Конвертуємо тиск з hPa в мм рт.ст. (1 hPa = 0.750062 мм рт.ст.)
+    // і вимикаємо графіки Вологості та Тиску за замовченням
     if (jsonData.datasets) {
       jsonData.datasets.forEach(dataset => {
         // Перевіряємо, чи це dataset з тиском
@@ -387,8 +388,16 @@ async function drawChart() {
           dataset.label.includes("давлени")
         );
         
+        // Перевіряємо, чи це dataset з вологістю
+        const isHumidityDataset = dataset.label && (
+          dataset.label.includes("Вологість") || 
+          dataset.label.includes("вологість") || 
+          dataset.label.includes("Humidity") || 
+          dataset.label.includes("humidity")
+        );
+        
         // Якщо не знайдено за лейблом, перевіряємо за значеннями
-        if (!isPressureDataset && dataset.data && dataset.data.length > 0) {
+        if (!isPressureDataset && !isHumidityDataset && dataset.data && dataset.data.length > 0) {
           const avg = dataset.data.reduce((a, b) => a + b, 0) / dataset.data.length;
           // Якщо середнє значення в діапазоні hPa (900-1100)
           if (avg > 900 && avg < 1100) {
@@ -401,6 +410,8 @@ async function drawChart() {
                 dataset.label = dataset.label.replace(/\(.*\)/, "(мм рт.ст.)");
               }
             }
+            // Вимкнути графік тиску за замовченням
+            dataset.hidden = true;
           }
         } else if (isPressureDataset && dataset.data) {
           // Якщо знайдено dataset з тиском, перевіряємо чи потрібна конвертація
@@ -413,6 +424,11 @@ async function drawChart() {
               dataset.label = dataset.label.replace(/hPa/gi, "мм рт.ст.");
             }
           }
+          // Вимкнути графік тиску за замовченням
+          dataset.hidden = true;
+        } else if (isHumidityDataset) {
+          // Вимкнути графік вологості за замовченням
+          dataset.hidden = true;
         }
       });
     }

@@ -319,16 +319,22 @@ client.on("message", function (topic, message) {
   }${latestMessage.BME280.Temperature} °C`;
   document.getElementById("sens-hum").innerText = `${latestMessage.BME280.Humidity}%`;
   
+  // Конвертуємо тиск з гПа в мм рт.ст. якщо потрібно (1 hPa = 0.750062 мм рт.ст.)
+  let rawPressure = latestMessage.BME280.Pressure;
+  // Якщо значення в діапазоні 900-1100, то це гПа, потрібно конвертувати
+  const currentPressure = (rawPressure > 900 && rawPressure < 1100) 
+    ? rawPressure * 0.750062 
+    : rawPressure;
+  
   // Відображаємо тиск з простим прогнозом спочатку
-  const currentPressure = latestMessage.BME280.Pressure;
   const simpleForecast = getWeatherForecast(currentPressure);
   document.getElementById("sens-pres").innerText =
-    `${currentPressure} мм рт.ст. (${simpleForecast})`;
+    `${currentPressure.toFixed(1)} мм рт.ст. (${simpleForecast})`;
   
   // Оновлюємо з детальним прогнозом на основі тренду (асинхронно)
   getWeatherForecastWithTrend(currentPressure).then(forecast => {
     document.getElementById("sens-pres").innerText =
-      `${currentPressure} мм рт.ст. (${forecast})`;
+      `${currentPressure.toFixed(1)} мм рт.ст. (${forecast})`;
   }).catch(err => {
     console.error("Помилка отримання прогнозу:", err);
     // Залишаємо простий прогноз

@@ -171,10 +171,10 @@ async function getWeatherForecastWithTrend(currentPressure) {
   const recentPressures = pressureDataset.data.slice(-6);
   
   // Перетворюємо hPa в мм рт.ст. якщо потрібно (припускаємо що дані можуть бути в hPa)
-  // 1 hPa ≈ 0.75 мм рт.ст.
+  // 1 hPa ≈ 0.750062 мм рт.ст.
   const pressuresInMmHg = recentPressures.map(p => {
-    // Якщо значення > 1000, то це hPa, інакше мм рт.ст.
-    return p > 1000 ? p * 0.75 : p;
+    // Якщо значення > 900 і < 1100, то це hPa, інакше мм рт.ст.
+    return (p > 900 && p < 1100) ? p * 0.750062 : p;
   });
   
   // Аналізуємо тренд
@@ -369,6 +369,47 @@ async function drawChart() {
     jsonData.labels = jsonData.labels.map((label) =>
       formatDateTime(new Date(label))
     );
+
+    // Конвертуємо тиск з hPa в мм рт.ст. (1 hPa = 0.750062 мм рт.ст.)
+    if (jsonData.datasets) {
+      jsonData.datasets.forEach(dataset => {
+        // Перевіряємо, чи це dataset з тиском
+        const isPressureDataset = dataset.label && (
+          dataset.label.includes("Тиск") || 
+          dataset.label.includes("тиск") || 
+          dataset.label.includes("hPa") || 
+          dataset.label.includes("давлени")
+        );
+        
+        // Якщо не знайдено за лейблом, перевіряємо за значеннями
+        if (!isPressureDataset && dataset.data && dataset.data.length > 0) {
+          const avg = dataset.data.reduce((a, b) => a + b, 0) / dataset.data.length;
+          // Якщо середнє значення в діапазоні hPa (900-1100)
+          if (avg > 900 && avg < 1100) {
+            // Конвертуємо значення з hPa в мм рт.ст.
+            dataset.data = dataset.data.map(p => p * 0.750062);
+            // Оновлюємо лейбл
+            if (dataset.label) {
+              dataset.label = dataset.label.replace(/hPa/gi, "мм рт.ст.");
+              if (!dataset.label.includes("мм рт.ст.") && !dataset.label.includes("Тиск")) {
+                dataset.label = dataset.label.replace(/\(.*\)/, "(мм рт.ст.)");
+              }
+            }
+          }
+        } else if (isPressureDataset && dataset.data) {
+          // Якщо знайдено dataset з тиском, перевіряємо чи потрібна конвертація
+          const avg = dataset.data.reduce((a, b) => a + b, 0) / dataset.data.length;
+          if (avg > 900 && avg < 1100) {
+            // Конвертуємо з hPa в мм рт.ст. (1 hPa = 0.750062 мм рт.ст.)
+            dataset.data = dataset.data.map(p => p * 0.750062);
+            // Оновлюємо лейбл
+            if (dataset.label) {
+              dataset.label = dataset.label.replace(/hPa/gi, "мм рт.ст.");
+            }
+          }
+        }
+      });
+    }
 
     new Chart(ctx, {
       type: "line",

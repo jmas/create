@@ -204,7 +204,7 @@ client.on("message", function (topic, message) {
   }${latestMessage.BME280.Temperature} °C`;
   document.getElementById("sens-hum").innerText = `${latestMessage.BME280.Humidity}%`;
   document.getElementById("sens-pres").innerText =
-    latestMessage.BME280.Pressure;
+    `${latestMessage.BME280.Pressure} мм рт.ст.`;
   document.getElementById("sens-descr").innerText = getDetailedFeeling(
     latestMessage.BME280.Temperature,
     latestMessage.BME280.Humidity

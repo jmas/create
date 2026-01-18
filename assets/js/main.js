@@ -98,6 +98,121 @@ function getDetailedFeelingImage(temp, humidity) {
     : "";
 }
 
+/* WEATHER PREDICTION UTILS */
+
+let chartDataCache = null;
+
+async function getChartData() {
+  if (chartDataCache) {
+    return chartDataCache;
+  }
+  
+  try {
+    const response = await fetch(
+      "https://api.github.com/repos/jmas/temperature-humidity-tracker/contents/chart_data.json",
+      {
+        headers: { Accept: "application/vnd.github.v3.raw" },
+      }
+    );
+
+    if (!response.ok) throw new Error("Помилка завантаження даних");
+
+    chartDataCache = await response.json();
+    return chartDataCache;
+  } catch (error) {
+    console.error("Помилка завантаження даних для прогнозу:", error);
+    return null;
+  }
+}
+
+function getWeatherForecast(currentPressure) {
+  // 760 мм рт.ст. = нормальний тиск (1013.25 hPa)
+  const normalPressure = 760;
+  
+  if (currentPressure >= normalPressure + 5) {
+    return "стабільна погода";
+  } else if (currentPressure >= normalPressure) {
+    return "стабільна погода";
+  } else if (currentPressure >= normalPressure - 10) {
+    return "нестабільна погода";
+  } else {
+    return "нестабільна погода";
+  }
+}
+
+async function getWeatherForecastWithTrend(currentPressure) {
+  const chartData = await getChartData();
+  
+  if (!chartData || !chartData.datasets) {
+    return getWeatherForecast(currentPressure);
+  }
+  
+  // Знаходимо набір даних з тиском
+  // Спочатку шукаємо за лейблом
+  let pressureDataset = chartData.datasets.find(
+    (ds) => ds.label && (ds.label.includes("Тиск") || ds.label.includes("тиск") || ds.label.includes("hPa") || ds.label.includes("давлени"))
+  );
+  
+  // Якщо не знайдено за лейблом, шукаємо за значеннями (hPa зазвичай 900-1100, мм рт.ст. 650-850)
+  if (!pressureDataset) {
+    pressureDataset = chartData.datasets.find((ds) => {
+      if (!ds.data || ds.data.length === 0) return false;
+      // Перевіряємо, чи середнє значення виглядає як тиск
+      const avg = ds.data.reduce((a, b) => a + b, 0) / ds.data.length;
+      return (avg > 900 && avg < 1100) || (avg > 650 && avg < 850);
+    });
+  }
+  
+  if (!pressureDataset || !pressureDataset.data || pressureDataset.data.length < 3) {
+    return getWeatherForecast(currentPressure);
+  }
+  
+  // Беремо останні 6 значень для аналізу тренду
+  const recentPressures = pressureDataset.data.slice(-6);
+  
+  // Перетворюємо hPa в мм рт.ст. якщо потрібно (припускаємо що дані можуть бути в hPa)
+  // 1 hPa ≈ 0.75 мм рт.ст.
+  const pressuresInMmHg = recentPressures.map(p => {
+    // Якщо значення > 1000, то це hPa, інакше мм рт.ст.
+    return p > 1000 ? p * 0.75 : p;
+  });
+  
+  // Аналізуємо тренд
+  const firstHalf = pressuresInMmHg.slice(0, Math.floor(pressuresInMmHg.length / 2));
+  const secondHalf = pressuresInMmHg.slice(Math.floor(pressuresInMmHg.length / 2));
+  
+  const avgFirst = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+  const avgSecond = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+  
+  const diff = avgSecond - avgFirst;
+  const normalPressure = 760;
+  
+  // Якщо тиск вже високий і зростає - стабільна
+  // Якщо тиск низький і падає - нестабільна
+  // Інакше визначаємо за абсолютним значенням
+  
+  let forecast = "";
+  if (currentPressure >= normalPressure) {
+    if (diff > 1) {
+      forecast = "стабільна погода (зростає)";
+    } else if (diff < -1) {
+      forecast = "стабільна погода (поступово падає)";
+    } else {
+      forecast = "стабільна погода";
+    }
+  } else {
+    if (diff < -1) {
+      forecast = "нестабільна погода (падає)";
+    } else if (diff > 1) {
+      forecast = "нестабільна погода (поступово зростає)";
+    } else {
+      forecast = "нестабільна погода";
+    }
+  }
+  
+  return forecast;
+}
+
 /* DATE TIME UTILS */
 
 const rtf = new Intl.RelativeTimeFormat(document.documentElement.lang, {
@@ -203,8 +318,22 @@ client.on("message", function (topic, message) {
     latestMessage.BME280.Temperature > 0 ? "+" : "-"
   }${latestMessage.BME280.Temperature} °C`;
   document.getElementById("sens-hum").innerText = `${latestMessage.BME280.Humidity}%`;
+  
+  // Відображаємо тиск з простим прогнозом спочатку
+  const currentPressure = latestMessage.BME280.Pressure;
+  const simpleForecast = getWeatherForecast(currentPressure);
   document.getElementById("sens-pres").innerText =
-    `${latestMessage.BME280.Pressure} мм рт.ст.`;
+    `${currentPressure} мм рт.ст. (${simpleForecast})`;
+  
+  // Оновлюємо з детальним прогнозом на основі тренду (асинхронно)
+  getWeatherForecastWithTrend(currentPressure).then(forecast => {
+    document.getElementById("sens-pres").innerText =
+      `${currentPressure} мм рт.ст. (${forecast})`;
+  }).catch(err => {
+    console.error("Помилка отримання прогнозу:", err);
+    // Залишаємо простий прогноз
+  });
+  
   document.getElementById("sens-descr").innerText = getDetailedFeeling(
     latestMessage.BME280.Temperature,
     latestMessage.BME280.Humidity
@@ -228,16 +357,12 @@ client.on("error", function (err) {
 
 async function drawChart() {
   try {
-    const response = await fetch(
-      "https://api.github.com/repos/jmas/temperature-humidity-tracker/contents/chart_data.json",
-      {
-        headers: { Accept: "application/vnd.github.v3.raw" },
-      }
-    );
-
-    if (!response.ok) throw new Error("Помилка завантаження даних");
-
-    const jsonData = await response.json();
+    // Використовуємо кешовані дані або завантажуємо їх
+    let jsonData = await getChartData();
+    
+    if (!jsonData) {
+      throw new Error("Помилка завантаження даних");
+    }
 
     const ctx = document.getElementById("sens-chart").getContext("2d");
 

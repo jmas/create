@@ -76,6 +76,7 @@ const weatherFeelings = [
     iconUrl: `${ICON_BASE_URL}/flame.svg`,
   },
 ];
+
 function getDetailedFeeling(temp, humidity) {
   const result = weatherFeelings.find((f) => f.condition(temp, humidity));
   return result

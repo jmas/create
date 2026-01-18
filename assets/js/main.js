@@ -193,7 +193,7 @@ client.on("message", function (topic, message) {
   const latestMessage = messages.get(latestKey);
   const date = new Date(latestMessage.Time);
   
-  document.getElementById("sens-power").innerText = latestMessage.Power === 'ON' ? 'Є живлення' : 'Немає живлення';
+  document.getElementById("sens-power").innerText = latestMessage.Switch1 === 'ON' ? 'Є живлення' : 'Немає живлення';
   document.getElementById("sens-date").innerText = `${formatDateTime(
     date
   )} (${formatTimeAgo(date)})`;

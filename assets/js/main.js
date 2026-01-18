@@ -386,7 +386,7 @@ async function drawChart() {
         },
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Температура та Вологість" },
+          title: { display: true, text: "Температура, Вологість, Тиск" },
           tooltip: {
             callbacks: {
               title: (context) => {

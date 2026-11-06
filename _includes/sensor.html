@@ -1,26 +1,7 @@
-<dl>
-  <dt>Живлення:</dt>
-  <dd><span id="sens-power-img"></span> <span id="sens-power">Н/Д</span></dd>
-  <dt>Температура:</dt>
-  <dd id="sens-temp">Н/Д</dd>
-  <dt>Вологість:</dt>
-  <dd id="sens-hum">Н/Д</dd>
-  <dt>Тиск:</dt>
-  <dd id="sens-pres">Н/Д</dd>
-  <dt>Опис:</dt>
-  <dd><span id="sens-img"></span> <span id="sens-descr">Н/Д</span></dd>
-  <dt>Час оновлення:</dt>
-  <dd id="sens-date">Н/Д</dd>
-</dl>
-
-<canvas
-  id="sens-chart"
-  style="margin-top: 1rem; width: 100%; max-width: 800px"
-></canvas>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-<script src="/assets/js/main.js"></script>
+<script
+  src="https://temperature-tracker.jmas-ukraine.workers.dev/embed.js"
+  data-theme="auto"
+></script>
 
 <details>
   <summary>Довідник станів мікроклімату та рекомендації</summary>
@@ -194,12 +175,4 @@
         <p><strong>Прогноз:</strong> Короткочасне покращення погоди, яке може супроводжуватися різким похолоданням або сильним холодним вітром.</p>
     </section>
 
-    <section>
-        <h2>3. Технічна примітка щодо датчиків (BMP280)</h2>
-        <ul>
-            <li><strong>Абсолютний тиск:</strong> Датчик показує тиск безпосередньо у вашій точці (на вашому поверсі).</li>
-            <li><strong>Відносний тиск:</strong> У новинах дають тиск, приведений до рівня моря. На кожні 10 метрів висоти тиск падає приблизно на 1.1 гПа (0.8 мм рт. ст.).</li>
-            <li><strong>Точність:</strong> Для прогнозу погоди в приміщенні датчик працює так само ефективно, як і на вулиці, оскільки тиск у будівлі миттєво вирівнюється з атмосферним.</li>
-        </ul>
-    </section>
 </details>

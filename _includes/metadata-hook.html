@@ -14,23 +14,31 @@
     })(window, document, "clarity", "script", "rfemxlwegm");
 </script>
 
-<!-- Remove the old PWA service worker left by previous builds. -->
+<!-- Reliable PWA update handling for Chirpy's update toast. -->
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
-      navigator.serviceWorker.getRegistrations().then(function (registrations) {
-        registrations.forEach(function (registration) {
-          registration.unregister();
-        });
+      navigator.serviceWorker.getRegistration().then(function (registration) {
+        if (!registration) return;
+
+        var updateButton = document.querySelector('#notification [aria-label="Update"]');
+        if (updateButton) {
+          updateButton.addEventListener("click", function () {
+            navigator.serviceWorker.getRegistration().then(function (current) {
+              if (current && current.waiting) {
+                current.waiting.postMessage("SKIP_WAITING");
+              }
+            });
+          });
+        }
       });
 
-      if (window.caches) {
-        caches.keys().then(function (keys) {
-          keys.forEach(function (key) {
-            caches.delete(key);
-          });
-        });
-      }
+      var reloading = false;
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (reloading) return;
+        reloading = true;
+        window.location.reload();
+      });
     });
   }
 </script>

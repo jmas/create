@@ -14,3 +14,24 @@
     })(window, document, "clarity", "script", "rfemxlwegm");
 </script>
 
+<!-- Remove the old PWA service worker left by previous builds. -->
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.getRegistrations().then(function (registrations) {
+        registrations.forEach(function (registration) {
+          registration.unregister();
+        });
+      });
+
+      if (window.caches) {
+        caches.keys().then(function (keys) {
+          keys.forEach(function (key) {
+            caches.delete(key);
+          });
+        });
+      }
+    });
+  }
+</script>
+
